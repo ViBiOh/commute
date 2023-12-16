@@ -55,7 +55,7 @@ func displayCommute(ctx context.Context, stravaApp strava.App, homeLatLng, workL
 		return
 	}
 
-	roundTrip := make(map[string]uint8)
+	roundTrips := make(map[string]uint8)
 
 	for _, activity := range activities {
 		if weekday := activity.StartDate.Weekday(); activity.Type != "Ride" || weekday < 0 || weekday > 5 {
@@ -63,25 +63,26 @@ func displayCommute(ctx context.Context, stravaApp strava.App, homeLatLng, workL
 		}
 
 		day := activity.StartDate.Format(time.DateOnly)
+
 		var found bool
 
 		if slices.Equal(activity.StartLatlng, homeLatLng) {
-			roundTrip[day] |= 1 << 3
+			roundTrips[day] |= 1 << 3
 			found = true
 		}
 
 		if slices.Equal(activity.EndLatlng, workLatLng) {
-			roundTrip[day] |= 1 << 2
+			roundTrips[day] |= 1 << 2
 			found = true
 		}
 
 		if slices.Equal(activity.StartLatlng, workLatLng) {
-			roundTrip[day] |= 1 << 1
+			roundTrips[day] |= 1 << 1
 			found = true
 		}
 
 		if slices.Equal(activity.EndLatlng, homeLatLng) {
-			roundTrip[day] |= 1 << 0
+			roundTrips[day] |= 1 << 0
 			found = true
 		}
 
@@ -90,13 +91,19 @@ func displayCommute(ctx context.Context, stravaApp strava.App, homeLatLng, workL
 		}
 	}
 
-	output := make([]string, 0, len(roundTrip))
+	output := make([]string, 0, len(roundTrips))
 
-	for date, status := range roundTrip {
-		output = append(output, fmt.Sprintf("%s | %04b", date, status))
+	for date, status := range roundTrips {
+		item := fmt.Sprintf("%s | %04b", date, status)
+
+		index := sort.Search(len(output), func(i int) bool {
+			return output[i] > item
+		})
+
+		output = append(output, item)
+		copy(output[index+1:], output[index:])
+		output[index] = item
 	}
-
-	sort.Strings(output)
 
 	fmt.Printf("%s\n", strings.Join(output, "\n"))
 }
