@@ -17,16 +17,17 @@ import (
 	"github.com/ViBiOh/strava/pkg/strava"
 )
 
-var (
-	homeLatLng = []float64{48.85, 2.29}
-	workLatLng = []float64{48.88, 2.34}
-)
-
 func main() {
+	var homeLatLng []float64
+	var workLatLng []float64
+
 	fs := flag.NewFlagSet("strava", flag.ExitOnError)
 	fs.Usage = flags.Usage(fs)
 
 	stravaConfig := strava.Flags(fs, "")
+
+	flags.New("Home", "Home LatLng").Prefix("strava").Float64SliceVar(fs, &homeLatLng, nil, nil)
+	flags.New("Work", "Work LatLng").Prefix("strava").Float64SliceVar(fs, &workLatLng, nil, nil)
 
 	if err := fs.Parse(os.Args[1:]); err != nil {
 		log.Fatal(fmt.Errorf("config: %w", err))
@@ -44,10 +45,10 @@ func main() {
 		return
 	}
 
-	displayCommute(ctx, stravaApp)
+	displayCommute(ctx, stravaApp, homeLatLng, workLatLng)
 }
 
-func displayCommute(ctx context.Context, stravaApp strava.App) {
+func displayCommute(ctx context.Context, stravaApp strava.App, homeLatLng, workLatLng []float64) {
 	activities, err := stravaApp.GetActivities(ctx)
 	if err != nil {
 		slog.ErrorContext(ctx, "get activities", "error", err)
