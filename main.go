@@ -7,27 +7,25 @@ import (
 	"log"
 	"log/slog"
 	"os"
-	"slices"
 	"sort"
 	"strings"
 	"time"
 
 	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
+	"github.com/ViBiOh/strava/pkg/coordinates"
+	"github.com/ViBiOh/strava/pkg/nominatim"
 	"github.com/ViBiOh/strava/pkg/strava"
 )
 
 func main() {
-	var homeLatLng []float64
-	var workLatLng []float64
-
 	fs := flag.NewFlagSet("strava", flag.ExitOnError)
 	fs.Usage = flags.Usage(fs)
 
 	stravaConfig := strava.Flags(fs, "")
 
-	flags.New("Home", "Home LatLng").Prefix("strava").Float64SliceVar(fs, &homeLatLng, nil, nil)
-	flags.New("Work", "Work LatLng").Prefix("strava").Float64SliceVar(fs, &workLatLng, nil, nil)
+	home := flags.New("Home", "Home LatLng").Prefix("strava").String(fs, "", nil)
+	work := flags.New("Work", "Work LatLng").Prefix("strava").String(fs, "", nil)
 
 	if err := fs.Parse(os.Args[1:]); err != nil {
 		log.Fatal(fmt.Errorf("config: %w", err))
@@ -39,21 +37,21 @@ func main() {
 
 	ctx := context.Background()
 
+	homeLatLng, err := nominatim.GetLatLng(ctx, *home)
+	FatalIfError(ctx, "get home lat lng", err)
+
+	workLatLng, err := nominatim.GetLatLng(ctx, *work)
+	FatalIfError(ctx, "get work lat lng", err)
+
 	stravaApp, err := strava.New(ctx, stravaConfig)
-	if err != nil {
-		slog.ErrorContext(ctx, "create strava", "error", err)
-		return
-	}
+	FatalIfError(ctx, "create strava", err)
 
 	displayCommute(ctx, stravaApp, homeLatLng, workLatLng)
 }
 
-func displayCommute(ctx context.Context, stravaApp strava.App, homeLatLng, workLatLng []float64) {
+func displayCommute(ctx context.Context, stravaApp strava.App, homeLatLng, workLatLng coordinates.LatLng) {
 	activities, err := stravaApp.GetActivities(ctx)
-	if err != nil {
-		slog.ErrorContext(ctx, "get activities", "error", err)
-		return
-	}
+	FatalIfError(ctx, "get activities", err)
 
 	roundTrips := make(map[string]uint8)
 
@@ -66,22 +64,28 @@ func displayCommute(ctx context.Context, stravaApp strava.App, homeLatLng, workL
 
 		var found bool
 
-		if slices.Equal(activity.StartLatlng, homeLatLng) {
+		startLatLng, err := coordinates.NewLatLng(activity.StartLatlng)
+		FatalIfError(ctx, "converting start", err)
+
+		endLatLng, err := coordinates.NewLatLng(activity.EndLatlng)
+		FatalIfError(ctx, "converting start", err)
+
+		if startLatLng.IsWithin(homeLatLng, .5) {
 			roundTrips[day] |= 1 << 3
 			found = true
 		}
 
-		if slices.Equal(activity.EndLatlng, workLatLng) {
+		if endLatLng.IsWithin(workLatLng, .5) {
 			roundTrips[day] |= 1 << 2
 			found = true
 		}
 
-		if slices.Equal(activity.StartLatlng, workLatLng) {
+		if startLatLng.IsWithin(workLatLng, .5) {
 			roundTrips[day] |= 1 << 1
 			found = true
 		}
 
-		if slices.Equal(activity.EndLatlng, homeLatLng) {
+		if endLatLng.IsWithin(homeLatLng, .5) {
 			roundTrips[day] |= 1 << 0
 			found = true
 		}
@@ -106,4 +110,13 @@ func displayCommute(ctx context.Context, stravaApp strava.App, homeLatLng, workL
 	}
 
 	fmt.Printf("%s\n", strings.Join(output, "\n"))
+}
+
+func FatalIfError(ctx context.Context, label string, err error) {
+	if err == nil {
+		return
+	}
+
+	slog.ErrorContext(ctx, label, "error", err)
+	os.Exit(1)
 }

@@ -8,17 +8,17 @@ Be careful when using the CLI values, if someone list the processes on the syste
 
 ```bash
 Usage of strava:
-  --address          string         [server] Listen address ${STRAVA_ADDRESS}
-  --cert             string         [server] Certificate file ${STRAVA_CERT}
-  --clientID         string         [strava] App Client ID ${STRAVA_CLIENT_ID} (default "118227")
-  --clientSecret     string         [strava] App Client Secret ${STRAVA_CLIENT_SECRET} (default "7a108e841554618aca66127df410397ec3814375")
-  --idleTimeout      duration       [server] Idle Timeout ${STRAVA_IDLE_TIMEOUT} (default 2m0s)
-  --key              string         [server] Key file ${STRAVA_KEY}
-  --name             string         [server] Name ${STRAVA_NAME} (default "http")
-  --port             uint           [server] Listen port (0 to disable) ${STRAVA_PORT} (default 1080)
-  --readTimeout      duration       [server] Read Timeout ${STRAVA_READ_TIMEOUT} (default 5s)
-  --shutdownTimeout  duration       [server] Shutdown Timeout ${STRAVA_SHUTDOWN_TIMEOUT} (default 10s)
-  --stravaHome       float64 slice  [strava] Home LatLng ${STRAVA_STRAVA_HOME}, as a float64 slice, environment variable separated by ","
-  --stravaWork       float64 slice  [strava] Work LatLng ${STRAVA_STRAVA_WORK}, as a float64 slice, environment variable separated by ","
-  --writeTimeout     duration       [server] Write Timeout ${STRAVA_WRITE_TIMEOUT} (default 10s)
+  --address          string    [server] Listen address ${STRAVA_ADDRESS}
+  --cert             string    [server] Certificate file ${STRAVA_CERT}
+  --clientID         string    [strava] App Client ID ${STRAVA_CLIENT_ID} (default "118227")
+  --clientSecret     string    [strava] App Client Secret ${STRAVA_CLIENT_SECRET} (default "7a108e841554618aca66127df410397ec3814375")
+  --idleTimeout      duration  [server] Idle Timeout ${STRAVA_IDLE_TIMEOUT} (default 2m0s)
+  --key              string    [server] Key file ${STRAVA_KEY}
+  --name             string    [server] Name ${STRAVA_NAME} (default "http")
+  --port             uint      [server] Listen port (0 to disable) ${STRAVA_PORT} (default 1080)
+  --readTimeout      duration  [server] Read Timeout ${STRAVA_READ_TIMEOUT} (default 5s)
+  --shutdownTimeout  duration  [server] Shutdown Timeout ${STRAVA_SHUTDOWN_TIMEOUT} (default 10s)
+  --stravaHome       string    [strava] Home LatLng ${STRAVA_STRAVA_HOME}
+  --stravaWork       string    [strava] Work LatLng ${STRAVA_STRAVA_WORK}
+  --writeTimeout     duration  [server] Write Timeout ${STRAVA_WRITE_TIMEOUT} (default 10s)
 ```

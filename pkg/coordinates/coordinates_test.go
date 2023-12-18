@@ -1,4 +1,4 @@
-package latlng
+package coordinates
 
 import (
 	"testing"

@@ -1,17 +1,34 @@
-package latlng
+package coordinates
 
-import "math"
+import (
+	"errors"
+	"math"
+)
 
 const EarthRadius = 6371
 
+var ErrLatLngNeedsExactlyTwoValues = errors.New("LatLng needs exactly two values")
+
 type LatLng [2]float64
 
-func (l LatLng) Lat() float64 {
-	return l[0]
+func NewLatLng(input []float64) (LatLng, error) {
+	if len(input) != 2 {
+		return LatLng{}, ErrLatLngNeedsExactlyTwoValues
+	}
+
+	return LatLng{input[0], input[1]}, nil
 }
 
-func (l LatLng) Lng() float64 {
-	return l[1]
+func (ll LatLng) Lat() float64 {
+	return ll[0]
+}
+
+func (ll LatLng) Lng() float64 {
+	return ll[1]
+}
+
+func (ll LatLng) IsWithin(b LatLng, distance float64) bool {
+	return ll.DistanceInKilometer(b) <= distance
 }
 
 func (l LatLng) DistanceInKilometer(b LatLng) float64 {
