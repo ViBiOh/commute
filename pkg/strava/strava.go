@@ -87,9 +87,12 @@ func oauthMux(clientID, clientSecret string, cancel func(), token *string) http.
 
 		if err = httpjson.Read(resp, &tokenResponse); err != nil {
 			httperror.InternalServerError(ctx, w, err)
+			return
 		}
 
 		*token = tokenResponse.AccessToken
+
+		_, _ = w.Write([]byte(`Authentication succeeded, you can close this tab.`))
 
 		cancel()
 	})
