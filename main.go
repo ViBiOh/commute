@@ -117,6 +117,6 @@ func FatalIfError(ctx context.Context, label string, err error) {
 		return
 	}
 
-	slog.ErrorContext(ctx, label, "error", err)
+	slog.LogAttrs(ctx, slog.LevelError, label, slog.Any("error", err))
 	os.Exit(1)
 }
