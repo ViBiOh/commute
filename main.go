@@ -18,6 +18,13 @@ import (
 	"github.com/ViBiOh/strava/pkg/strava"
 )
 
+const (
+	HOME_ARRIVE = 1 << iota
+	WORK_LEAVE
+	WORK_ARRIVE
+	HOME_LEAVE
+)
+
 func main() {
 	fs := flag.NewFlagSet("strava", flag.ExitOnError)
 	fs.Usage = flags.Usage(fs)
@@ -53,48 +60,7 @@ func displayCommute(ctx context.Context, stravaApp strava.App, homeLatLng, workL
 	activities, err := stravaApp.GetActivities(ctx)
 	FatalIfError(ctx, "get activities", err)
 
-	roundTrips := make(map[string]uint8)
-
-	for _, activity := range activities {
-		if weekday := activity.StartDate.Weekday(); activity.Type != "Ride" || weekday < 0 || weekday > 5 {
-			continue
-		}
-
-		day := activity.StartDate.Format(time.DateOnly)
-
-		var found bool
-
-		startLatLng, err := coordinates.NewLatLng(activity.StartLatlng)
-		FatalIfError(ctx, "converting start", err)
-
-		endLatLng, err := coordinates.NewLatLng(activity.EndLatlng)
-		FatalIfError(ctx, "converting start", err)
-
-		if startLatLng.IsWithin(homeLatLng, .5) {
-			roundTrips[day] |= 1 << 3
-			found = true
-		}
-
-		if endLatLng.IsWithin(workLatLng, .5) {
-			roundTrips[day] |= 1 << 2
-			found = true
-		}
-
-		if startLatLng.IsWithin(workLatLng, .5) {
-			roundTrips[day] |= 1 << 1
-			found = true
-		}
-
-		if endLatLng.IsWithin(homeLatLng, .5) {
-			roundTrips[day] |= 1 << 0
-			found = true
-		}
-
-		if !found {
-			fmt.Println(activity.StartDate, activity.Name, "from", activity.StartLatlng, "to", activity.EndLatlng)
-		}
-	}
-
+	roundTrips := computeCommute(ctx, activities, homeLatLng, workLatLng)
 	output := make([]string, 0, len(roundTrips))
 
 	for date, status := range roundTrips {
@@ -110,6 +76,52 @@ func displayCommute(ctx context.Context, stravaApp strava.App, homeLatLng, workL
 	}
 
 	fmt.Printf("%s\n", strings.Join(output, "\n"))
+}
+
+func computeCommute(ctx context.Context, activities []strava.Activity, homeLatLng coordinates.LatLng, workLatLng coordinates.LatLng) map[string]uint8 {
+	roundTrips := make(map[string]uint8)
+
+	for _, activity := range activities {
+		if weekday := activity.StartDate.Weekday(); activity.Type != "Ride" || weekday < 0 || weekday > 5 {
+			continue
+		}
+
+		day := activity.StartDate.Format(time.DateOnly)
+
+		var found bool
+
+		startLatLng, err := coordinates.NewLatLng(activity.StartLatlng)
+		FatalIfError(ctx, "converting start", err)
+
+		endLatLng, err := coordinates.NewLatLng(activity.EndLatlng)
+		FatalIfError(ctx, "converting end", err)
+
+		if startLatLng.IsWithin(homeLatLng, .5) {
+			roundTrips[day] |= HOME_LEAVE
+			found = true
+		}
+
+		if endLatLng.IsWithin(workLatLng, .5) {
+			roundTrips[day] |= WORK_ARRIVE
+			found = true
+		}
+
+		if startLatLng.IsWithin(workLatLng, .5) {
+			roundTrips[day] |= WORK_LEAVE
+			found = true
+		}
+
+		if endLatLng.IsWithin(homeLatLng, .5) {
+			roundTrips[day] |= HOME_ARRIVE
+			found = true
+		}
+
+		if !found {
+			fmt.Println(activity.StartDate, activity.Name, "from", activity.StartLatlng, "to", activity.EndLatlng)
+		}
+	}
+
+	return roundTrips
 }
 
 func FatalIfError(ctx context.Context, label string, err error) {
