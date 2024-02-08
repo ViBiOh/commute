@@ -2,19 +2,21 @@ package strava
 
 import (
 	"context"
+	"encoding/base64"
 	"flag"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"os/exec"
+	"sort"
+	"strings"
 
 	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/httperror"
 	"github.com/ViBiOh/httputils/v4/pkg/httpjson"
-	"github.com/ViBiOh/httputils/v4/pkg/httputils"
-	"github.com/ViBiOh/httputils/v4/pkg/recoverer"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
-	"github.com/ViBiOh/httputils/v4/pkg/server"
+	"github.com/ViBiOh/strava/pkg/coordinates"
 )
 
 const (
@@ -23,93 +25,140 @@ const (
 	apiURL    = "https://www.strava.com/api/v3"
 )
 
-type App struct {
-	ClientID string
-	request  request.Request
+type Service struct {
+	clientID     string
+	clientSecret string
 }
 
-type StravaConfig struct {
-	server       *server.Config
+type Config struct {
 	ClientID     string
 	ClientSecret string
 }
 
-func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) *StravaConfig {
-	var config StravaConfig
+func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) *Config {
+	var config Config
 
 	flags.New("ClientID", "App Client ID").DocPrefix("strava").StringVar(fs, &config.ClientID, "", nil)
 	flags.New("ClientSecret", "App Client Secret").DocPrefix("strava").StringVar(fs, &config.ClientSecret, "", nil)
 
-	config.server = server.Flags(fs, "")
-
 	return &config
 }
 
-func New(ctx context.Context, config *StravaConfig) (App, error) {
-	loginURL := fmt.Sprintf("%s?client_id=%s&response_type=code&redirect_uri=http://127.0.0.1:%d/exchange_token&approval_prompt=force&scope=read&scope=activity:read", authURL, config.ClientID, config.server.Port)
-	if err := exec.Command("open", loginURL).Run(); err != nil {
-		return App{}, fmt.Errorf("open login URL: %w", err)
+func New(config *Config) Service {
+	return Service{
+		clientID:     config.ClientID,
+		clientSecret: config.ClientSecret,
 	}
-
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	var token string
-
-	oauthServer := server.New(config.server)
-	oauthServer.Start(ctx, httputils.Handler(oauthMux(config.ClientID, config.ClientSecret, cancel, &token), nil, recoverer.Middleware))
-
-	return App{
-		ClientID: config.ClientID,
-		request:  request.Get(apiURL).Header("Authorization", fmt.Sprintf("Bearer %s", token)),
-	}, nil
 }
 
-func oauthMux(clientID, clientSecret string, cancel func(), token *string) http.Handler {
-	mux := http.NewServeMux()
+func (s Service) Open(uri string, home, work coordinates.LatLng) error {
+	redirectValues := url.Values{}
+	redirectValues.Add("key", base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s|%s", home.String(), work.String()))))
 
-	mux.HandleFunc("/exchange_token", func(w http.ResponseWriter, r *http.Request) {
-		values := url.Values{}
-		values.Add("client_id", clientID)
-		values.Add("client_secret", clientSecret)
-		values.Add("code", r.URL.Query().Get("code"))
-		values.Add("grant+type", "authorization_code")
+	values := url.Values{}
+	values.Add("client_id", s.clientID)
+	values.Add("response_type", "code")
+	values.Add("approval_prompt", "force")
+	values.Add("scope", "read")
+	values.Add("scope", "activity:read")
+	values.Add("redirect_uri", fmt.Sprintf("%s/api/exchange_token?%s", uri, redirectValues.Encode()))
 
+	loginURL := fmt.Sprintf("%s?%s", authURL, values.Encode())
+
+	return exec.Command("open", loginURL).Run()
+}
+
+func (s Service) Handle() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		resp, err := request.Post(authToken).Form(ctx, values)
+		home, work, err := parseKey(r)
 		if err != nil {
-			httperror.InternalServerError(ctx, w, fmt.Errorf("exchange token: %w", err))
+			httperror.BadRequest(ctx, w, fmt.Errorf("parse key: %w", err))
 			return
 		}
 
-		var tokenResponse TokenResponse
-
-		if err = httpjson.Read(resp, &tokenResponse); err != nil {
+		requester, err := s.exchangeToken(ctx, r)
+		if err != nil {
 			httperror.InternalServerError(ctx, w, err)
 			return
 		}
 
-		*token = tokenResponse.AccessToken
+		activities, err := s.getActivities(ctx, requester)
+		if err != nil {
+			httperror.InternalServerError(ctx, w, err)
+			return
+		}
 
-		_, _ = w.Write([]byte(`Authentication succeeded, you can close this tab.`))
+		commutes, err := computeCommute(activities, home, work)
+		if err != nil {
+			httperror.InternalServerError(ctx, w, err)
+			return
+		}
 
-		cancel()
+		formatCommute(commutes, w)
 	})
-
-	return mux
 }
 
-func (a App) GetActivities(ctx context.Context) ([]Activity, error) {
-	resp, err := a.request.Path("/athlete/activities?per_page=100").Send(ctx, nil)
+func formatCommute(commutes map[string]uint8, w io.Writer) {
+	output := make([]string, 0, len(commutes))
+
+	for date, status := range commutes {
+		item := fmt.Sprintf("%s | %04b", date, status)
+
+		index := sort.Search(len(output), func(i int) bool {
+			return output[i] > item
+		})
+
+		output = append(output, item)
+		copy(output[index+1:], output[index:])
+		output[index] = item
+	}
+
+	fmt.Fprintf(w, "%s\n", strings.Join(output, "\n"))
+}
+
+func (s Service) exchangeToken(ctx context.Context, r *http.Request) (request.Request, error) {
+	values := url.Values{}
+	values.Add("client_id", s.clientID)
+	values.Add("client_secret", s.clientSecret)
+	values.Add("code", r.URL.Query().Get("code"))
+	values.Add("grant+type", "authorization_code")
+
+	resp, err := request.Post(authToken).Form(ctx, values)
 	if err != nil {
-		return nil, fmt.Errorf("get activities: %w", err)
+		return request.Request{}, fmt.Errorf("exchange token: %w", err)
 	}
 
-	var activities []Activity
-	if err = httpjson.Read(resp, &activities); err != nil {
-		return nil, err
+	var tokenResponse TokenResponse
+
+	if err = httpjson.Read(resp, &tokenResponse); err != nil {
+		return request.Request{}, fmt.Errorf("read token: %w", err)
 	}
 
-	return activities, nil
+	return request.Get(apiURL).Header("Authorization", fmt.Sprintf("Bearer %s", tokenResponse.AccessToken)), nil
+}
+
+func parseKey(r *http.Request) (coordinates.LatLng, coordinates.LatLng, error) {
+	rawKey, err := base64.StdEncoding.DecodeString(r.URL.Query().Get("key"))
+	if err != nil {
+		return coordinates.LatLng{}, coordinates.LatLng{}, fmt.Errorf("invalid key: %w", err)
+	}
+
+	parts := strings.Split(string(rawKey), "|")
+	if len(parts) != 2 {
+		return coordinates.LatLng{}, coordinates.LatLng{}, fmt.Errorf("malformed key: %w", err)
+	}
+
+	home, err := coordinates.ParseLatLng(parts[0])
+	if err != nil {
+		return coordinates.LatLng{}, coordinates.LatLng{}, fmt.Errorf("parse home: %w", err)
+	}
+
+	work, err := coordinates.ParseLatLng(parts[1])
+	if err != nil {
+		return coordinates.LatLng{}, coordinates.LatLng{}, fmt.Errorf("parse work: %w", err)
+	}
+
+	return home, work, nil
 }

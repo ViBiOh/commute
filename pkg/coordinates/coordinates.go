@@ -2,7 +2,10 @@ package coordinates
 
 import (
 	"errors"
+	"fmt"
 	"math"
+	"strconv"
+	"strings"
 )
 
 const EarthRadius = 6371
@@ -17,6 +20,29 @@ func NewLatLng(input []float64) (LatLng, error) {
 	}
 
 	return LatLng{input[0], input[1]}, nil
+}
+
+func ParseLatLng(raw string) (LatLng, error) {
+	parts := strings.Split(raw, ",")
+	if len(parts) != 2 {
+		return LatLng{}, ErrLatLngNeedsExactlyTwoValues
+	}
+
+	lat, err := strconv.ParseFloat(parts[0], 64)
+	if err != nil {
+		return LatLng{}, errors.New("latitude is not a float")
+	}
+
+	lng, err := strconv.ParseFloat(parts[1], 64)
+	if err != nil {
+		return LatLng{}, errors.New("longitude is not a float")
+	}
+
+	return LatLng{lat, lng}, nil
+}
+
+func (ll LatLng) String() string {
+	return fmt.Sprintf("%f,%f", ll[0], ll[1])
 }
 
 func (ll LatLng) Lat() float64 {
