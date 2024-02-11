@@ -18,8 +18,12 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.1 // indirect
+	github.com/klauspost/cpuid/v2 v2.2.6 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rabbitmq/amqp091-go v1.9.0 // indirect
+	github.com/tdewolff/minify/v2 v2.20.16 // indirect
+	github.com/tdewolff/parse/v2 v2.7.11 // indirect
+	github.com/zeebo/xxh3 v1.0.2 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.47.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.47.0 // indirect
 	go.opentelemetry.io/otel v1.22.0 // indirect

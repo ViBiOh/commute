@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"embed"
 	"fmt"
 	"log"
 	"net/http"
@@ -15,6 +16,9 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/server"
 	"github.com/ViBiOh/strava/pkg/nominatim"
 )
+
+//go:embed templates static
+var content embed.FS
 
 func main() {
 	config, err := newConfig()
@@ -33,13 +37,16 @@ func main() {
 	client, err := newClient(ctx, config)
 	logger.FatalfOnErr(ctx, err, "client")
 
+	adapter, err := newAdapter(config, client)
+	logger.FatalfOnErr(ctx, err, "adapter")
+
 	service := newService(config)
 
 	defer client.Close(ctx)
 
 	httpServer := server.New(config.http)
 
-	go httpServer.Start(client.health.EndCtx(), httputils.Handler(newPort(config, service), client.health, recoverer.Middleware, client.telemetry.Middleware("http"), owasp.New(config.owasp).Middleware, cors.New(config.cors).Middleware))
+	go httpServer.Start(client.health.EndCtx(), httputils.Handler(newPort(config, adapter, service), client.health, recoverer.Middleware, client.telemetry.Middleware("http"), owasp.New(config.owasp).Middleware, cors.New(config.cors).Middleware))
 
 	home, err := nominatim.GetLatLng(ctx, *config.home)
 	logger.FatalfOnErr(ctx, err, "home")

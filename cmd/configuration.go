@@ -10,6 +10,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/health"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/owasp"
+	"github.com/ViBiOh/httputils/v4/pkg/renderer"
 	"github.com/ViBiOh/httputils/v4/pkg/server"
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 	"github.com/ViBiOh/strava/pkg/strava"
@@ -23,6 +24,7 @@ type configuration struct {
 	owasp     *owasp.Config
 	http      *server.Config
 	health    *health.Config
+	renderer  *renderer.Config
 
 	strava *strava.Config
 	home   *string
@@ -41,6 +43,7 @@ func newConfig() (configuration, error) {
 		telemetry: telemetry.Flags(fs, "telemetry"),
 		owasp:     owasp.Flags(fs, ""),
 		cors:      cors.Flags(fs, "cors"),
+		renderer:  renderer.Flags(fs, "renderer"),
 
 		strava: strava.Flags(fs, ""),
 

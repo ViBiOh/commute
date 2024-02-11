@@ -1,0 +1,25 @@
+{{ define "public" }}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{{ .Title }}</title>
+  </head>
+  <body>
+    <h1>
+      <a href="{{ publicURL "/" }}">Indemnités kilométriques Vélo from your Strava rides</a>
+    </h1>
+    <h1>
+      <a href="{{ url "/" }}">Hello {{ .Version }}!</a>
+    </h1>
+  </body>
+</html>
+{{ end }}
+
+{{ define "error" }}
+{{ .Message }}
+{{ end }}
+
+{{ define "svg-test" }}
+color={{ . }}
+{{ end }}
