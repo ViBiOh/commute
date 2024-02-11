@@ -12,6 +12,17 @@
     <h1>
       <a href="{{ url "/" }}">Hello {{ .Version }}!</a>
     </h1>
+
+    <form method="POST" action="/api/compute">
+      <p>
+        <label for="home">Home</label>
+        <input id="home" type="text" name="home">
+      </p>
+      <p>
+        <label for="work">Work</label>
+        <input id="work" type="text" name="work">
+      </p>
+    </form>
   </body>
 </html>
 {{ end }}

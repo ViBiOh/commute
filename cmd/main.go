@@ -14,7 +14,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/owasp"
 	"github.com/ViBiOh/httputils/v4/pkg/recoverer"
 	"github.com/ViBiOh/httputils/v4/pkg/server"
-	"github.com/ViBiOh/strava/pkg/nominatim"
 )
 
 //go:embed templates static
@@ -48,14 +47,14 @@ func main() {
 
 	go httpServer.Start(client.health.EndCtx(), httputils.Handler(newPort(config, adapter, service), client.health, recoverer.Middleware, client.telemetry.Middleware("http"), owasp.New(config.owasp).Middleware, cors.New(config.cors).Middleware))
 
-	home, err := nominatim.GetLatLng(ctx, *config.home)
-	logger.FatalfOnErr(ctx, err, "home")
+	// home, err := nominatim.GetLatLng(ctx, *config.home)
+	// logger.FatalfOnErr(ctx, err, "home")
 
-	work, err := nominatim.GetLatLng(ctx, *config.work)
-	logger.FatalfOnErr(ctx, err, "work")
+	// work, err := nominatim.GetLatLng(ctx, *config.work)
+	// logger.FatalfOnErr(ctx, err, "work")
 
-	err = service.strava.Open(fmt.Sprintf("http://localhost:%d", config.http.Port), home, work)
-	logger.FatalfOnErr(ctx, err, "open")
+	// err = service.strava.Open(fmt.Sprintf("http://localhost:%d", config.http.Port), home, work)
+	// logger.FatalfOnErr(ctx, err, "open")
 
 	client.health.WaitForTermination(httpServer.Done())
 
