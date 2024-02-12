@@ -53,6 +53,7 @@ dev: format style test build
 .PHONY: init
 init:
 	@curl --disable --silent --show-error --location --max-time 30 "https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap" | bash -s -- "-c" "git_hooks" "coverage" "release"
+	go install "github.com/a-h/templ/cmd/templ@latest"
 	go install "github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
 	go install "golang.org/x/tools/cmd/goimports@latest"
 	go install "golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment@master"
@@ -85,6 +86,7 @@ bench:
 ## build: Build the application.
 .PHONY: build
 build:
+	templ generate
 	CGO_ENABLED=0 go build -ldflags="-s -w" -installsuffix nocgo -o bin/$(APP_NAME) $(MAIN_SOURCE)
 
 ## run: Locally run the application, e.g. node index.js, python -m myapp, go run myapp etc ...
