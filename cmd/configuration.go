@@ -39,7 +39,7 @@ func newConfig() (configuration, error) {
 		alcotest:  alcotest.Flags(fs, ""),
 		logger:    logger.Flags(fs, "logger"),
 		telemetry: telemetry.Flags(fs, "telemetry"),
-		owasp:     owasp.Flags(fs, ""),
+		owasp:     owasp.Flags(fs, "", flags.NewOverride("Csp", "default-src 'self'; base-uri 'self'; script-src 'self' 'httputils-nonce'; style-src 'self' 'httputils-nonce'")),
 		cors:      cors.Flags(fs, "cors"),
 
 		strava: strava.Flags(fs, ""),

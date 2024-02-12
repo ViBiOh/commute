@@ -1,0 +1,7 @@
+package templ
+
+templ Hello(nonce, title, name string) {
+  @Root(nonce, title) {
+    <div>Hello, it's me { name }</div>
+  }
+}

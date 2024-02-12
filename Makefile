@@ -92,6 +92,7 @@ build:
 ## run: Locally run the application, e.g. node index.js, python -m myapp, go run myapp etc ...
 .PHONY: run
 run:
+	templ generate
 	$(MAIN_RUNNER)
 
 ## config: Create local configuration
