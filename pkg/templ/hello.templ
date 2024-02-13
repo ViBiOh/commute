@@ -1,7 +1,19 @@
 package templ
 
-templ Hello(nonce, title, name string) {
+templ Form(nonce, title string) {
   @Root(nonce, title) {
-    <div>Hello, it's me { name }</div>
+    <form action="/api/compute">
+      <p>
+        <label for="home">Home</label>
+        <input id="home" name="home" type="text"/>
+      </p>
+      <p>
+        <label for="work">Work</label>
+        <input id="work" name="work" type="text"/>
+      </p>
+      <p>
+        <input type="submit" class="primary" value="Compute"/>
+      </p>
+    </form>
   }
 }

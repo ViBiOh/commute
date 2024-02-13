@@ -5,15 +5,12 @@ package templ
 
 //lint:file-ignore SA4006 This context is only used if a nested component is present.
 
-import (
-	"bytes"
-	"context"
-	"io"
+import "github.com/a-h/templ"
+import "context"
+import "io"
+import "bytes"
 
-	"github.com/a-h/templ"
-)
-
-func Hello(nonce, title, name string) templ.Component {
+func Form(nonce, title string) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -32,20 +29,7 @@ func Hello(nonce, title, name string) templ.Component {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div>Hello, it's me ")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(name)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/templ/hello.templ`, Line: 4, Col: 30}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form action=\"/api/compute\"><p><label for=\"home\">Home</label> <input id=\"home\" name=\"home\" type=\"text\"></p><p><label for=\"work\">Work</label> <input id=\"work\" name=\"work\" type=\"text\"></p><p><input type=\"submit\" class=\"primary\" value=\"Compute\"></p></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

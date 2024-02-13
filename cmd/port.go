@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	title         = "Calcul Indemnites Kilométriques Vélo"
+	title         = "Compute Indemnites Kilométriques Vélo"
 	exchangeToken = "/api/exchange_token"
 )
 
@@ -23,7 +23,7 @@ func newPort(config configuration, service service) http.Handler {
 
 		ctx := r.Context()
 
-		component := templ.Hello(nonce, title, "world")
+		component := templ.Form(nonce, title)
 		if err := component.Render(ctx, w); err != nil {
 			httperror.InternalServerError(ctx, w, err)
 		}
