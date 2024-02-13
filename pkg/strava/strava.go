@@ -8,7 +8,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"os/exec"
 	"sort"
 	"strings"
 
@@ -17,6 +16,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/httpjson"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/ViBiOh/strava/pkg/coordinates"
+	"github.com/ViBiOh/strava/pkg/nominatim"
 )
 
 const (
@@ -26,6 +26,7 @@ const (
 )
 
 type Service struct {
+	uri          string
 	clientID     string
 	clientSecret string
 }
@@ -46,12 +47,42 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) *Config
 
 func New(config *Config) Service {
 	return Service{
+		uri:          "http://localhost:1080",
 		clientID:     config.ClientID,
 		clientSecret: config.ClientSecret,
 	}
 }
 
-func (s Service) Open(uri string, home, work coordinates.LatLng) error {
+func (s Service) Handle() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/compute":
+			s.handleCompute(w, r)
+
+		case "/exchange_token":
+			s.handleStravaCallback(w, r)
+
+		default:
+			httperror.NotFound(r.Context(), w)
+		}
+	})
+}
+
+func (s Service) handleCompute(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	home, err := nominatim.GetLatLng(ctx, r.FormValue("home"))
+	if err != nil {
+		httperror.InternalServerError(ctx, w, fmt.Errorf("geocode home: %w", err))
+		return
+	}
+
+	work, err := nominatim.GetLatLng(ctx, r.FormValue("work"))
+	if err != nil {
+		httperror.InternalServerError(ctx, w, fmt.Errorf("geocode work: %w", err))
+		return
+	}
+
 	redirectValues := url.Values{}
 	redirectValues.Add("key", base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s|%s", home.String(), work.String()))))
 
@@ -61,61 +92,39 @@ func (s Service) Open(uri string, home, work coordinates.LatLng) error {
 	values.Add("approval_prompt", "force")
 	values.Add("scope", "read")
 	values.Add("scope", "activity:read")
-	values.Add("redirect_uri", fmt.Sprintf("%s/api/exchange_token?%s", uri, redirectValues.Encode()))
+	values.Add("redirect_uri", fmt.Sprintf("%s/api/exchange_token?%s", s.uri, redirectValues.Encode()))
 
-	loginURL := fmt.Sprintf("%s?%s", authURL, values.Encode())
-
-	return exec.Command("open", loginURL).Run()
+	http.Redirect(w, r, fmt.Sprintf("%s?%s", authURL, values.Encode()), http.StatusFound)
 }
 
-func (s Service) Handle() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
+func (s Service) handleStravaCallback(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 
-		home, work, err := parseKey(r)
-		if err != nil {
-			httperror.BadRequest(ctx, w, fmt.Errorf("parse key: %w", err))
-			return
-		}
-
-		requester, err := s.exchangeToken(ctx, r)
-		if err != nil {
-			httperror.InternalServerError(ctx, w, err)
-			return
-		}
-
-		activities, err := s.getActivities(ctx, requester)
-		if err != nil {
-			httperror.InternalServerError(ctx, w, err)
-			return
-		}
-
-		commutes, err := computeCommute(activities, home, work)
-		if err != nil {
-			httperror.InternalServerError(ctx, w, err)
-			return
-		}
-
-		formatCommute(commutes, w)
-	})
-}
-
-func formatCommute(commutes map[string]uint8, w io.Writer) {
-	output := make([]string, 0, len(commutes))
-
-	for date, status := range commutes {
-		item := fmt.Sprintf("%s | %04b", date, status)
-
-		index := sort.Search(len(output), func(i int) bool {
-			return output[i] > item
-		})
-
-		output = append(output, item)
-		copy(output[index+1:], output[index:])
-		output[index] = item
+	home, work, err := parseKey(r)
+	if err != nil {
+		httperror.BadRequest(ctx, w, fmt.Errorf("parse key: %w", err))
+		return
 	}
 
-	fmt.Fprintf(w, "%s\n", strings.Join(output, "\n"))
+	requester, err := s.exchangeToken(ctx, r)
+	if err != nil {
+		httperror.InternalServerError(ctx, w, err)
+		return
+	}
+
+	activities, err := s.getActivities(ctx, requester)
+	if err != nil {
+		httperror.InternalServerError(ctx, w, err)
+		return
+	}
+
+	commutes, err := computeCommute(activities, home, work)
+	if err != nil {
+		httperror.InternalServerError(ctx, w, err)
+		return
+	}
+
+	formatCommute(commutes, w)
 }
 
 func (s Service) exchangeToken(ctx context.Context, r *http.Request) (request.Request, error) {
@@ -161,4 +170,22 @@ func parseKey(r *http.Request) (coordinates.LatLng, coordinates.LatLng, error) {
 	}
 
 	return home, work, nil
+}
+
+func formatCommute(commutes map[string]uint8, w io.Writer) {
+	output := make([]string, 0, len(commutes))
+
+	for date, status := range commutes {
+		item := fmt.Sprintf("%s | %04b", date, status)
+
+		index := sort.Search(len(output), func(i int) bool {
+			return output[i] > item
+		})
+
+		output = append(output, item)
+		copy(output[index+1:], output[index:])
+		output[index] = item
+	}
+
+	fmt.Fprintf(w, "%s\n", strings.Join(output, "\n"))
 }

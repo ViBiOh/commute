@@ -2,7 +2,7 @@ package templ
 
 templ Form(nonce, title string) {
   @Root(nonce, title) {
-    <form action="/api/compute">
+    <form method="POST" action="/api/compute">
       <p>
         <label for="home">Home</label>
         <input id="home" name="home" type="text"/>

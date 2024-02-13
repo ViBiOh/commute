@@ -9,14 +9,15 @@ import (
 )
 
 const (
-	title         = "Compute Indemnites Kilométriques Vélo"
-	exchangeToken = "/api/exchange_token"
+	title   = "Compute Indemnites Kilométriques Vélo"
+	apiPath = "/api"
 )
 
 func newPort(config configuration, service service) http.Handler {
 	mux := http.NewServeMux()
 
-	mux.Handle(exchangeToken, http.StripPrefix(exchangeToken, service.strava.Handle()))
+	mux.Handle(apiPath+"/compute", http.StripPrefix(apiPath, service.strava.Handle()))
+	mux.Handle(apiPath+"/exchange_token", http.StripPrefix(apiPath, service.strava.Handle()))
 	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		nonce := owasp.Nonce()
 		owasp.WriteNonce(w, nonce)

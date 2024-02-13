@@ -29,7 +29,7 @@ func Form(nonce, title string) templ.Component {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form action=\"/api/compute\"><p><label for=\"home\">Home</label> <input id=\"home\" name=\"home\" type=\"text\"></p><p><label for=\"work\">Work</label> <input id=\"work\" name=\"work\" type=\"text\"></p><p><input type=\"submit\" class=\"primary\" value=\"Compute\"></p></form>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form method=\"POST\" action=\"/api/compute\"><p><label for=\"home\">Home</label> <input id=\"home\" name=\"home\" type=\"text\"></p><p><label for=\"work\">Work</label> <input id=\"work\" name=\"work\" type=\"text\"></p><p><input type=\"submit\" class=\"primary\" value=\"Compute\"></p></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
