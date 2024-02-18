@@ -1,4 +1,3 @@
----
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
@@ -26,11 +25,11 @@ spec:
     nameOverride: strava
     image:
       name: vibioh/strava
-      tag: "latest" # {"$imagepolicy": "default:flux-strava-api:tag"}
+      tag: "202402181237" # {"$imagepolicy": "default:flux-strava-api:tag"}
     labels:
       tags.datadoghq.com/env: "production"
       tags.datadoghq.com/service: "strava"
-      tags.datadoghq.com/version: "latest" # {"$imagepolicy": "default:flux-strava-api:tag"}
+      tags.datadoghq.com/version: "202402181237" # {"$imagepolicy": "default:flux-strava-api:tag"}
     env:
       - name: GOMAXPROCS
         valueFrom:
