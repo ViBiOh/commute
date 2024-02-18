@@ -38,7 +38,7 @@ func newConfig() (configuration, error) {
 		alcotest:  alcotest.Flags(fs, ""),
 		logger:    logger.Flags(fs, "logger"),
 		telemetry: telemetry.Flags(fs, "telemetry"),
-		owasp:     owasp.Flags(fs, "", flags.NewOverride("Csp", "default-src 'self'; base-uri 'self'; script-src 'self' 'unsafe-inline' unpkg.com/leaflet@1.9.4/dist/; style-src 'self' 'httputils-nonce' unpkg.com/leaflet@1.9.4/dist/; img-src 'self' data: unpkg.com/leaflet@1.9.4/dist/images/ a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org")),
+		owasp:     owasp.Flags(fs, "", flags.NewOverride("Csp", "default-src 'self'; base-uri 'self'; script-src 'self'; style-src 'self' 'httputils-nonce'; img-src 'self' api.mapbox.com/styles/v1/mapbox/dark-v11/")),
 		cors:      cors.Flags(fs, "cors"),
 
 		strava:    strava.Flags(fs, ""),

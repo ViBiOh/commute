@@ -25,17 +25,17 @@ func NewLatLng(input []float64) (LatLng, error) {
 func ParseLatLng(raw string) (LatLng, error) {
 	parts := strings.Split(raw, ",")
 	if len(parts) != 2 {
-		return LatLng{}, ErrLatLngNeedsExactlyTwoValues
+		return LatLng{}, fmt.Errorf("`%s`: %w", raw, ErrLatLngNeedsExactlyTwoValues)
 	}
 
 	lat, err := strconv.ParseFloat(parts[0], 64)
 	if err != nil {
-		return LatLng{}, errors.New("latitude is not a float")
+		return LatLng{}, fmt.Errorf("latitude is not a float `%s`", raw)
 	}
 
 	lng, err := strconv.ParseFloat(parts[1], 64)
 	if err != nil {
-		return LatLng{}, errors.New("longitude is not a float")
+		return LatLng{}, fmt.Errorf("longitude is not a float `%s`", raw)
 	}
 
 	return LatLng{lat, lng}, nil
@@ -43,6 +43,10 @@ func ParseLatLng(raw string) (LatLng, error) {
 
 func (ll LatLng) String() string {
 	return fmt.Sprintf("%f,%f", ll[0], ll[1])
+}
+
+func (ll LatLng) LngLat() string {
+	return fmt.Sprintf("%f,%f", ll[1], ll[0])
 }
 
 func (ll LatLng) Lat() float64 {

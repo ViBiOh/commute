@@ -2,7 +2,9 @@ package templ
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/ViBiOh/httputils/v4/pkg/httperror"
 	"github.com/ViBiOh/httputils/v4/pkg/owasp"
@@ -31,13 +33,18 @@ func DisplayForm(ctx context.Context, w http.ResponseWriter, uri string, fields 
 	}
 }
 
-func DisplayResult(ctx context.Context, w http.ResponseWriter, uri string, home, work coordinates.LatLng, commutes model.Commutes) {
+func DisplayResult(ctx context.Context, w http.ResponseWriter, uri string, mapboxToken string, home, work coordinates.LatLng, commutes model.Commutes) {
 	nonce := owasp.Nonce()
 	owasp.WriteNonce(w, nonce)
 
 	telemetry.SetRouteTag(ctx, "result")
 
-	component := Result(uri, nonce, title, home, work, commutes)
+	staticValues := url.Values{}
+	staticValues.Add("access_token", mapboxToken)
+
+	staticImageURL := fmt.Sprintf("https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/pin-s-home+669c35(%s),pin-s+0061ff(%s)/auto/400x300@2x?%s", home.LngLat(), work.LngLat(), staticValues.Encode())
+
+	component := Result(uri, nonce, title, staticImageURL, commutes)
 	if err := component.Render(ctx, w); err != nil {
 		httperror.InternalServerError(ctx, w, err)
 	}

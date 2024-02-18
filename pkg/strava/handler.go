@@ -105,7 +105,7 @@ func (s Service) handleStravaCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	templ.DisplayResult(ctx, w, s.uri, home, work, commutes)
+	templ.DisplayResult(ctx, w, s.uri, s.mapboxToken, home, work, commutes)
 }
 
 func (s Service) exchangeToken(ctx context.Context, r *http.Request) (request.Request, error) {
