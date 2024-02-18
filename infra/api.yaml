@@ -49,6 +49,7 @@ spec:
             fieldPath: metadata.labels['tags.datadoghq.com/service']
     config:
       OTEL_RESOURCE_ATTRIBUTES: env=production,git.repository_url=github.com/ViBiOh/strava
+      STRAVA_ACCESS_TOKEN: pk.eyJ1IjoidmliaW9oIiwiYSI6ImNqMzFmbTFoOTAwMWMycW82YXppbGRidXAifQ.bb6xyGsr1kQW3UozHS2Pmw
       STRAVA_LOGGER_JSON: "true"
       STRAVA_PUBLIC_URL: https://strava.vibioh.fr
       STRAVA_TELEMETRY_URL: datadog.observability:4317
