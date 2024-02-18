@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/ViBiOh/strava/pkg/coordinates"
+	"github.com/ViBiOh/strava/pkg/model"
 )
 
 const (
@@ -14,8 +15,8 @@ const (
 	HOME_LEAVE
 )
 
-func computeCommute(activities []Activity, home, work coordinates.LatLng) (map[string]uint8, error) {
-	roundTrips := make(map[string]uint8)
+func computeCommute(activities []Activity, home, work coordinates.LatLng) (model.Commutes, error) {
+	roundTrips := model.Commutes{}
 
 	for _, activity := range activities {
 		if weekday := activity.StartDate.Weekday(); activity.Type != "Ride" || weekday < 0 || weekday > 5 {

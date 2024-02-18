@@ -1,0 +1,52 @@
+package templ
+
+import "github.com/ViBiOh/strava/pkg/coordinates"
+import "github.com/ViBiOh/strava/pkg/model"
+
+templ Result(nonce, title string, home, work coordinates.LatLng, commutes model.Commutes) {
+  @Root(nonce, title) {
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <div id="map-container">
+      <noscript class="white">
+        <h2>You must enable Javascript to have interactive map with pictures.</h2>
+      </noscript>
+    </div>
+    <style type="text/css" nonce={ nonce }>
+      #map-container {
+        height: 30rem;
+        margin: 0 auto:
+      }
+    </style>
+    <script type="text/javascript" nonce={ nonce }>
+      // create Leaflet map
+      const map = L.map("map-container", {
+        center: [46.227638, 2.213749], // France 🇫🇷
+        zoom: 5,
+      });
+
+      // add the OpenStreetMap tiles
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution:
+          '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+      }).addTo(map);
+    </script>
+    @loadMap(home, work)
+    <pre>
+      { commutes.String() }
+    </pre>
+  }
+}
+
+script loadMap(home, work coordinates.LatLng) {
+  L.marker(home).addTo(map);
+  L.marker(work).addTo(map);
+
+  map.fitBounds([home, work]);
+}

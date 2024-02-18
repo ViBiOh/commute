@@ -17,10 +17,9 @@ Usage of strava:
   --corsHeaders       string    [cors] Access-Control-Allow-Headers ${STRAVA_CORS_HEADERS} (default "Content-Type")
   --corsMethods       string    [cors] Access-Control-Allow-Methods ${STRAVA_CORS_METHODS} (default "GET")
   --corsOrigin        string    [cors] Access-Control-Allow-Origin ${STRAVA_CORS_ORIGIN} (default "*")
-  --csp               string    [owasp] Content-Security-Policy ${STRAVA_CSP} (default "default-src 'self'; base-uri 'self'")
+  --csp               string    [owasp] Content-Security-Policy ${STRAVA_CSP} (default "default-src 'self'; base-uri 'self'; script-src 'self' 'unsafe-inline' unpkg.com/leaflet@1.9.4/dist/; style-src 'self' 'httputils-nonce' unpkg.com/leaflet@1.9.4/dist/; img-src 'self' data: unpkg.com/leaflet@1.9.4/dist/images/ a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org")
   --frameOptions      string    [owasp] X-Frame-Options ${STRAVA_FRAME_OPTIONS} (default "deny")
   --graceDuration     duration  [http] Grace duration when signal received ${STRAVA_GRACE_DURATION} (default 30s)
-  --home              string    [strava] Home LatLng ${STRAVA_HOME} (default "Address of your Home")
   --hsts                        [owasp] Indicate Strict Transport Security ${STRAVA_HSTS} (default true)
   --idleTimeout       duration  [server] Idle Timeout ${STRAVA_IDLE_TIMEOUT} (default 2m0s)
   --key               string    [server] Key file ${STRAVA_KEY}
@@ -39,6 +38,5 @@ Usage of strava:
   --telemetryUint64             [telemetry] Change OpenTelemetry Trace ID format to an unsigned int 64 ${STRAVA_TELEMETRY_UINT64} (default true)
   --url               string    [alcotest] URL to check ${STRAVA_URL}
   --userAgent         string    [alcotest] User-Agent for check ${STRAVA_USER_AGENT} (default "Alcotest")
-  --work              string    [strava] Work LatLng ${STRAVA_WORK} (default "Address of your Work")
   --writeTimeout      duration  [server] Write Timeout ${STRAVA_WRITE_TIMEOUT} (default 10s)
 ```

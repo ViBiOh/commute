@@ -1,15 +1,15 @@
 package templ
 
-templ Form(nonce, title string) {
+templ Form(nonce, title string, values map[string]Field) {
   @Root(nonce, title) {
     <form method="POST" action="/api/compute">
       <p>
         <label for="home">Home</label>
-        <input id="home" name="home" type="text"/>
+        <input id="home" name="home" type="text" value={ values["home"].Value }/>
       </p>
       <p>
         <label for="work">Work</label>
-        <input id="work" name="work" type="text"/>
+        <input id="work" name="work" type="text" value={ values["work"].Value }/>
       </p>
       <p>
         <input type="submit" class="primary" value="Compute"/>

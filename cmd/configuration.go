@@ -25,8 +25,6 @@ type configuration struct {
 	health    *health.Config
 
 	strava *strava.Config
-	home   *string
-	work   *string
 }
 
 func newConfig() (configuration, error) {
@@ -39,12 +37,9 @@ func newConfig() (configuration, error) {
 		alcotest:  alcotest.Flags(fs, ""),
 		logger:    logger.Flags(fs, "logger"),
 		telemetry: telemetry.Flags(fs, "telemetry"),
-		owasp:     owasp.Flags(fs, "", flags.NewOverride("Csp", "default-src 'self'; base-uri 'self'; script-src 'self' 'httputils-nonce'; style-src 'self' 'httputils-nonce'")),
+		owasp:     owasp.Flags(fs, "", flags.NewOverride("Csp", "default-src 'self'; base-uri 'self'; script-src 'self' 'unsafe-inline' unpkg.com/leaflet@1.9.4/dist/; style-src 'self' 'httputils-nonce' unpkg.com/leaflet@1.9.4/dist/; img-src 'self' data: unpkg.com/leaflet@1.9.4/dist/images/ a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org")),
 		cors:      cors.Flags(fs, "cors"),
 
 		strava: strava.Flags(fs, ""),
-
-		home: flags.New("Home", "Home LatLng").DocPrefix("strava").String(fs, "Address of your Home", nil),
-		work: flags.New("Work", "Work LatLng").DocPrefix("strava").String(fs, "Address of your Work", nil),
 	}, fs.Parse(os.Args[1:])
 }
