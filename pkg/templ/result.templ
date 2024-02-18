@@ -3,8 +3,8 @@ package templ
 import "github.com/ViBiOh/strava/pkg/coordinates"
 import "github.com/ViBiOh/strava/pkg/model"
 
-templ Result(nonce, title string, home, work coordinates.LatLng, commutes model.Commutes) {
-  @Root(nonce, title) {
+templ Result(uri, nonce, title string, home, work coordinates.LatLng, commutes model.Commutes) {
+  @Root(uri, nonce, title) {
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -38,6 +38,10 @@ templ Result(nonce, title string, home, work coordinates.LatLng, commutes model.
       }).addTo(map);
     </script>
     @loadMap(home, work)
+    <div>
+      <p>Home: { home.String() }</p>
+      <p>Work: { work.String() }</p>
+    </div>
     <pre>
       { commutes.String() }
     </pre>

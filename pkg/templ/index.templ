@@ -1,6 +1,6 @@
 package templ
 
-templ Root(nonce, title string) {
+templ Root(uri, nonce, title string) {
   <!DOCTYPE html>
   <html lang="en">
     <head>
@@ -13,7 +13,9 @@ templ Root(nonce, title string) {
       <div class="content">
         <header class="flex padding">
           <h1 class="no-margin no-padding">
-            { title }
+            <a href={ templ.URL(uri) }>
+              { title }
+            </a>
           </h1>
         </header>
         <article class="padding center">

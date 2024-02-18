@@ -8,6 +8,6 @@ type service struct {
 
 func newService(config configuration) service {
 	return service{
-		strava: strava.New(config.strava),
+		strava: strava.New(config.strava, *config.publicURL),
 	}
 }

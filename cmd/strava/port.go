@@ -14,7 +14,7 @@ func newPort(config configuration, service service) http.Handler {
 	mux := http.NewServeMux()
 
 	mux.Handle(apiPath, service.strava.Handle())
-	mux.Handle("/", http.HandlerFunc(templ.HandlerFunc))
+	mux.Handle("/", templ.Handler(*config.publicURL))
 
 	return mux
 }

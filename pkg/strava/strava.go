@@ -32,9 +32,9 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) *Config
 	return &config
 }
 
-func New(config *Config) Service {
+func New(config *Config, uri string) Service {
 	return Service{
-		uri:          "http://localhost:1080",
+		uri:          uri,
 		clientID:     config.ClientID,
 		clientSecret: config.ClientSecret,
 	}

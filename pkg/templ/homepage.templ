@@ -1,18 +1,28 @@
 package templ
 
-templ Form(nonce, title string, values map[string]Field) {
-  @Root(nonce, title) {
+templ Form(uri, nonce, title string, values map[string]Field) {
+  @Root(uri, nonce, title) {
     <form method="POST" action="/api/compute">
       <p>
-        <label for="home">Home</label>
+        <label for="home" class="padding">Home</label>
         <input id="home" name="home" type="text" value={ values["home"].Value }/>
+        if err := values["home"].Err; err != nil {
+          <div class="bg-danger">
+            { err.Error() }
+          </div>
+        }
       </p>
       <p>
-        <label for="work">Work</label>
+        <label for="work" class="padding">Work</label>
         <input id="work" name="work" type="text" value={ values["work"].Value }/>
+        if err := values["home"].Err; err != nil {
+          <div class="bg-danger">
+            { err.Error() }
+          </div>
+        }
       </p>
       <p>
-        <input type="submit" class="primary" value="Compute"/>
+        <input type="submit" value="Compute"/>
       </p>
     </form>
   }

@@ -45,6 +45,7 @@ Usage of strava:
   --name              string    [server] Name ${STRAVA_NAME} (default "http")
   --okStatus          int       [http] Healthy HTTP Status code ${STRAVA_OK_STATUS} (default 204)
   --port              uint      [server] Listen port (0 to disable) ${STRAVA_PORT} (default 1080)
+  --publicURL         string    Public URL for redirection ${STRAVA_PUBLIC_URL} (default "localhost:1080")
   --readTimeout       duration  [server] Read Timeout ${STRAVA_READ_TIMEOUT} (default 5s)
   --shutdownTimeout   duration  [server] Shutdown Timeout ${STRAVA_SHUTDOWN_TIMEOUT} (default 10s)
   --telemetryRate     string    [telemetry] OpenTelemetry sample rate, 'always', 'never' or a float value ${STRAVA_TELEMETRY_RATE} (default "always")

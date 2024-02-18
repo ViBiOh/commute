@@ -41,7 +41,7 @@ func (s Service) handleCompute(w http.ResponseWriter, r *http.Request) {
 	home, work, fields := s.geocodeAddresses(ctx, r)
 
 	if fields.HasError() {
-		templ.DisplayForm(ctx, w, fields)
+		templ.DisplayForm(ctx, w, s.uri, fields)
 		return
 	}
 
@@ -73,7 +73,7 @@ func (s Service) geocodeAddress(ctx context.Context, value string) (coordinates.
 
 	var latLng coordinates.LatLng
 
-	latLng, field.Err = nominatim.GetLatLng(ctx, value)
+	latLng, field.Value, field.Err = nominatim.GetLatLng(ctx, value)
 
 	return latLng, field
 }
@@ -105,7 +105,7 @@ func (s Service) handleStravaCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	templ.DisplayResult(ctx, w, home, work, commutes)
+	templ.DisplayResult(ctx, w, s.uri, home, work, commutes)
 }
 
 func (s Service) exchangeToken(ctx context.Context, r *http.Request) (request.Request, error) {

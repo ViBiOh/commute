@@ -24,7 +24,8 @@ type configuration struct {
 	http      *server.Config
 	health    *health.Config
 
-	strava *strava.Config
+	strava    *strava.Config
+	publicURL *string
 }
 
 func newConfig() (configuration, error) {
@@ -40,6 +41,7 @@ func newConfig() (configuration, error) {
 		owasp:     owasp.Flags(fs, "", flags.NewOverride("Csp", "default-src 'self'; base-uri 'self'; script-src 'self' 'unsafe-inline' unpkg.com/leaflet@1.9.4/dist/; style-src 'self' 'httputils-nonce' unpkg.com/leaflet@1.9.4/dist/; img-src 'self' data: unpkg.com/leaflet@1.9.4/dist/images/ a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org")),
 		cors:      cors.Flags(fs, "cors"),
 
-		strava: strava.Flags(fs, ""),
+		strava:    strava.Flags(fs, ""),
+		publicURL: flags.New("PublicURL", "Public URL for redirection").String(fs, "http://localhost:1080", nil),
 	}, fs.Parse(os.Args[1:])
 }
