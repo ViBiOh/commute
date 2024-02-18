@@ -1,5 +1,19 @@
 # strava
 
+[![Build](https://github.com/ViBiOh/strava/workflows/Build/badge.svg)](https://github.com/ViBiOh/strava/actions)
+[![codecov](https://codecov.io/gh/ViBiOh/strava/branch/main/graph/badge.svg)](https://codecov.io/gh/ViBiOh/strava)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ViBiOh_strava&metric=alert_status)](https://sonarcloud.io/dashboard?id=ViBiOh_strava)
+
+## Getting started
+
+Golang binary is built with static link. You can download it directly from the [GitHub Release page](https://github.com/ViBiOh/strava/releases) or build it by yourself by cloning this repo and running `make`.
+
+A Docker image is available for `amd64`, `arm` and `arm64` platforms on Docker Hub: [vibioh/strava](https://hub.docker.com/r/vibioh/strava/tags).
+
+You can configure app by passing CLI args or environment variables (cf. [Usage](#usage) section). CLI override environment variables.
+
+You'll find a Kubernetes exemple in the [`infra/`](infra) folder, using my [`app chart`](https://github.com/ViBiOh/charts/tree/main/app)
+
 ## Usage
 
 The application can be configured by passing CLI args described below or their equivalent as environment variable. CLI values take precedence over environments variables.
