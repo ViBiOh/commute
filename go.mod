@@ -21,6 +21,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rabbitmq/amqp091-go v1.9.0 // indirect
+	github.com/twpayne/go-polyline v1.1.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.48.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.48.0 // indirect
 	go.opentelemetry.io/otel v1.23.1 // indirect

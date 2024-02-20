@@ -99,7 +99,13 @@ func (s Service) handleStravaCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	commutes, err := computeCommute(activities, home, work)
+	rides, err := getRides(activities)
+	if err != nil {
+		httperror.InternalServerError(ctx, w, err)
+		return
+	}
+
+	commutes, err := getCommutes(rides, home, work)
 	if err != nil {
 		httperror.InternalServerError(ctx, w, err)
 		return
