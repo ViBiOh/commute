@@ -35,24 +35,82 @@ func (s Service) Handle() http.Handler {
 	})
 }
 
-func (s Service) handleCompute(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	home, work, fields := s.geocodeAddresses(ctx, r)
-
-	if fields.HasError() {
-		templ.DisplayForm(ctx, w, s.uri, fields)
-		return
-	}
-
+func (s Service) StravaLoginURL() string {
 	values := url.Values{}
 	values.Add("client_id", s.clientID)
 	values.Add("response_type", "code")
 	values.Add("scope", "read")
 	values.Add("scope", "activity:read")
-	values.Add("redirect_uri", fmt.Sprintf("%s/api/exchange_token?%s", s.uri, encodeKey(home, work)))
+	values.Add("redirect_uri", fmt.Sprintf("%s/api/exchange_token", s.uri))
 
-	http.Redirect(w, r, fmt.Sprintf("%s?%s", authURL, values.Encode()), http.StatusFound)
+	return fmt.Sprintf("%s?%s", authURL, values.Encode())
+}
+
+func (s Service) handleStravaCallback(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	token, err := s.exchangeToken(ctx, r)
+	if err != nil {
+		httperror.InternalServerError(ctx, w, err)
+		return
+	}
+
+	templ.DisplayForm(ctx, w, s.uri, token, nil)
+}
+
+func (s Service) exchangeToken(ctx context.Context, r *http.Request) (string, error) {
+	values := url.Values{}
+	values.Add("client_id", s.clientID)
+	values.Add("client_secret", s.clientSecret)
+	values.Add("code", r.URL.Query().Get("code"))
+	values.Add("grant+type", "authorization_code")
+
+	resp, err := request.Post(authToken).Form(ctx, values)
+	if err != nil {
+		return "", fmt.Errorf("exchange token: %w", err)
+	}
+
+	var tokenResponse TokenResponse
+
+	if err = httpjson.Read(resp, &tokenResponse); err != nil {
+		return "", fmt.Errorf("read token: %w", err)
+	}
+
+	return tokenResponse.AccessToken, nil
+}
+
+func (s Service) handleCompute(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	token := r.FormValue("token")
+	home, work, fields := s.geocodeAddresses(ctx, r)
+
+	if fields.HasError() {
+		templ.DisplayForm(ctx, w, s.uri, token, fields)
+		return
+	}
+
+	requester := request.Get(apiURL).Header("Authorization", fmt.Sprintf("Bearer %s", token))
+
+	activities, err := s.getActivities(ctx, requester)
+	if err != nil {
+		httperror.InternalServerError(ctx, w, err)
+		return
+	}
+
+	rides, err := getRides(activities)
+	if err != nil {
+		httperror.InternalServerError(ctx, w, err)
+		return
+	}
+
+	commutes, err := getCommutes(rides, home, work)
+	if err != nil {
+		httperror.InternalServerError(ctx, w, err)
+		return
+	}
+
+	templ.DisplayResult(ctx, w, s.uri, s.mapboxToken, home, work, commutes)
 }
 
 func (s Service) geocodeAddresses(ctx context.Context, r *http.Request) (coordinates.LatLng, coordinates.LatLng, templ.Fields) {
@@ -76,61 +134,4 @@ func (s Service) geocodeAddress(ctx context.Context, value string) (coordinates.
 	latLng, field.Value, field.Err = nominatim.GetLatLng(ctx, value)
 
 	return latLng, field
-}
-
-func (s Service) handleStravaCallback(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	home, work, err := parseKey(r)
-	if err != nil {
-		httperror.BadRequest(ctx, w, fmt.Errorf("parse key: %w", err))
-		return
-	}
-
-	requester, err := s.exchangeToken(ctx, r)
-	if err != nil {
-		httperror.InternalServerError(ctx, w, err)
-		return
-	}
-
-	activities, err := s.getActivities(ctx, requester)
-	if err != nil {
-		httperror.InternalServerError(ctx, w, err)
-		return
-	}
-
-	rides, err := getRides(activities)
-	if err != nil {
-		httperror.InternalServerError(ctx, w, err)
-		return
-	}
-
-	commutes, err := getCommutes(rides, home, work)
-	if err != nil {
-		httperror.InternalServerError(ctx, w, err)
-		return
-	}
-
-	templ.DisplayResult(ctx, w, s.uri, s.mapboxToken, home, work, commutes)
-}
-
-func (s Service) exchangeToken(ctx context.Context, r *http.Request) (request.Request, error) {
-	values := url.Values{}
-	values.Add("client_id", s.clientID)
-	values.Add("client_secret", s.clientSecret)
-	values.Add("code", r.URL.Query().Get("code"))
-	values.Add("grant+type", "authorization_code")
-
-	resp, err := request.Post(authToken).Form(ctx, values)
-	if err != nil {
-		return request.Request{}, fmt.Errorf("exchange token: %w", err)
-	}
-
-	var tokenResponse TokenResponse
-
-	if err = httpjson.Read(resp, &tokenResponse); err != nil {
-		return request.Request{}, fmt.Errorf("read token: %w", err)
-	}
-
-	return request.Get(apiURL).Header("Authorization", fmt.Sprintf("Bearer %s", tokenResponse.AccessToken)), nil
 }

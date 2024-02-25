@@ -15,19 +15,31 @@ import (
 
 const title = "Compute Indemnites Kilométriques Vélo"
 
-func Handler(uri string) http.Handler {
+func Handler(uri, loginURL string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		DisplayForm(r.Context(), w, uri, nil)
+		RenderLogin(r.Context(), w, uri, loginURL)
 	})
 }
 
-func DisplayForm(ctx context.Context, w http.ResponseWriter, uri string, fields Fields) {
+func RenderLogin(ctx context.Context, w http.ResponseWriter, uri, loginURL string) {
 	nonce := owasp.Nonce()
 	owasp.WriteNonce(w, nonce)
 
-	telemetry.SetRouteTag(ctx, "index")
+	telemetry.SetRouteTag(ctx, "login")
 
-	component := Form(uri, nonce, title, fields)
+	component := Login(uri, nonce, title, loginURL)
+	if err := component.Render(ctx, w); err != nil {
+		httperror.InternalServerError(ctx, w, err)
+	}
+}
+
+func DisplayForm(ctx context.Context, w http.ResponseWriter, uri, token string, fields Fields) {
+	nonce := owasp.Nonce()
+	owasp.WriteNonce(w, nonce)
+
+	telemetry.SetRouteTag(ctx, "form")
+
+	component := Form(uri, nonce, title, token, fields)
 	if err := component.Render(ctx, w); err != nil {
 		httperror.InternalServerError(ctx, w, err)
 	}

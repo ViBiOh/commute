@@ -1,8 +1,15 @@
 package templ
 
-templ Form(uri, nonce, title string, values map[string]Field) {
+templ Login(uri, nonce, title, loginURL string) {
+  @Root(uri, nonce, title) {
+    <a href={ templ.URL(loginURL) }>Connect with Strava</a>
+  }
+}
+
+templ Form(uri, nonce, title, token string, values map[string]Field) {
   @Root(uri, nonce, title) {
     <form method="POST" action="/api/compute">
+      <input type="hidden" name="token" value={ token }/>
       <p>
         <label for="home" class="padding">Home</label>
         <input id="home" name="home" type="text" value={ values["home"].Value }/>
