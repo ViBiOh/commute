@@ -55,6 +55,14 @@ func (s Service) handleStravaCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	rides, err := s.fetchRides(ctx, token)
+	if err != nil {
+		httperror.InternalServerError(ctx, w, err)
+		return
+	}
+
+	getClusters(rides)
+
 	templ.DisplayForm(ctx, w, s.uri, token, nil)
 }
 
@@ -90,15 +98,7 @@ func (s Service) handleCompute(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	requester := request.Get(apiURL).Header("Authorization", fmt.Sprintf("Bearer %s", token))
-
-	activities, err := s.getActivities(ctx, requester)
-	if err != nil {
-		httperror.InternalServerError(ctx, w, err)
-		return
-	}
-
-	rides, err := getRides(activities)
+	rides, err := s.fetchRides(ctx, token)
 	if err != nil {
 		httperror.InternalServerError(ctx, w, err)
 		return
@@ -111,6 +111,22 @@ func (s Service) handleCompute(w http.ResponseWriter, r *http.Request) {
 	}
 
 	templ.DisplayResult(ctx, w, s.uri, s.mapboxToken, home, work, commutes)
+}
+
+func (s Service) fetchRides(ctx context.Context, token string) ([]Ride, error) {
+	requester := request.Get(apiURL).Header("Authorization", fmt.Sprintf("Bearer %s", token))
+
+	activities, err := s.getActivities(ctx, requester)
+	if err != nil {
+		return nil, fmt.Errorf("get activities: %w", err)
+	}
+
+	rides, err := getRides(activities)
+	if err != nil {
+		return nil, fmt.Errorf("get rides: %w", err)
+	}
+
+	return rides, nil
 }
 
 func (s Service) geocodeAddresses(ctx context.Context, r *http.Request) (coordinates.LatLng, coordinates.LatLng, templ.Fields) {

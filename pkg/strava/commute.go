@@ -22,14 +22,14 @@ type Ride struct {
 	end   coordinates.LatLng
 }
 
-func GetClusters(rides []Ride) [][]coordinates.LatLng {
+func getClusters(rides []Ride) []coordinates.LatLng {
 	var coords []coordinates.LatLng
 	for _, ride := range rides {
 		coords = append(coords, ride.start)
 		coords = append(coords, ride.end)
 	}
 
-	var groups [][]coordinates.LatLng
+	var groups []coordinates.LatLng
 
 	for len(coords) > 0 {
 		var nextCoords []coordinates.LatLng
@@ -47,7 +47,7 @@ func GetClusters(rides []Ride) [][]coordinates.LatLng {
 			}
 		}
 
-		groups = append(groups, currentGroup)
+		groups = append(groups, coordinates.Center(currentGroup...))
 		coords = nextCoords
 	}
 

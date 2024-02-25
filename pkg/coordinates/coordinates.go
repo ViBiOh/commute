@@ -75,3 +75,21 @@ func (l LatLng) DistanceInKilometer(b LatLng) float64 {
 func degreesToRadians(degrees float64) float64 {
 	return degrees * math.Pi / 180
 }
+
+func Center(coords ...LatLng) LatLng {
+	if len(coords) == 0 {
+		return LatLng{}
+	}
+
+	var output LatLng
+
+	for _, coord := range coords {
+		output[0] += coord[0]
+		output[1] += coord[1]
+	}
+
+	output[0] = output[0] / float64(len(coords))
+	output[1] = output[1] / float64(len(coords))
+
+	return output
+}
