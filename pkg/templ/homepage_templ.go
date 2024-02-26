@@ -147,7 +147,67 @@ func Form(uri, nonce, title, token string, values map[string]Field) templ.Compon
 					return templ_7745c5c3_Err
 				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p><p><input type=\"submit\" value=\"Compute\"></p></form>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p><p><label for=\"distance\" class=\"padding\">Distance from points in meters</label> <select id=\"distance\" name=\"distance\"><option value=\"250\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if values["distance"].Value == "250" {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" selected")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(">250</option> <option value=\"500\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if values["distance"].Value == "500" || len(values["distance"].Value) == 0 {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" selected")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(">500</option> <option value=\"750\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if values["distance"].Value == "750" {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" selected")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(">750</option> <option value=\"1000\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if values["distance"].Value == "1000" {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" selected")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(">1000</option> <option value=\"1250\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if values["distance"].Value == "1250" {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" selected")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(">1250</option> <option value=\"1500\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if values["distance"].Value == "1500" {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" selected")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(">1500</option></select></p><p><input type=\"submit\" value=\"Compute\"></p></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

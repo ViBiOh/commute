@@ -14,12 +14,14 @@ const (
 	WORK_LEAVE
 	WORK_ARRIVE
 	HOME_LEAVE
+	COMMUTE
 )
 
 type Ride struct {
-	date  time.Time
-	start coordinates.LatLng
-	end   coordinates.LatLng
+	date    time.Time
+	start   coordinates.LatLng
+	end     coordinates.LatLng
+	commute bool
 }
 
 func getClusters(rides []Ride) []coordinates.LatLng {
@@ -85,16 +87,17 @@ func getRides(activities []Activity) ([]Ride, error) {
 		}
 
 		output = append(output, Ride{
-			date:  activity.StartDate,
-			start: start,
-			end:   end,
+			date:    activity.StartDate,
+			start:   start,
+			end:     end,
+			commute: activity.Commute,
 		})
 	}
 
 	return output, nil
 }
 
-func getCommutes(rides []Ride, home, work coordinates.LatLng) (model.Commutes, error) {
+func getCommutes(rides []Ride, home, work coordinates.LatLng, distance float64) (model.Commutes, error) {
 	roundTrips := model.Commutes{}
 
 	for _, ride := range rides {
@@ -104,20 +107,24 @@ func getCommutes(rides []Ride, home, work coordinates.LatLng) (model.Commutes, e
 
 		day := ride.date.Format(time.DateOnly)
 
-		if ride.start.IsWithin(home, .5) {
+		if ride.start.IsWithin(home, distance) {
 			roundTrips[day] |= HOME_LEAVE
 		}
 
-		if ride.end.IsWithin(work, .5) {
+		if ride.end.IsWithin(work, distance) {
 			roundTrips[day] |= WORK_ARRIVE
 		}
 
-		if ride.start.IsWithin(work, .5) {
+		if ride.start.IsWithin(work, distance) {
 			roundTrips[day] |= WORK_LEAVE
 		}
 
-		if ride.end.IsWithin(home, .5) {
+		if ride.end.IsWithin(home, distance) {
 			roundTrips[day] |= HOME_ARRIVE
+		}
+
+		if ride.commute {
+			roundTrips[day] |= COMMUTE
 		}
 	}
 

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 
 	"github.com/ViBiOh/httputils/v4/pkg/httperror"
 	"github.com/ViBiOh/httputils/v4/pkg/httpjson"
@@ -91,7 +92,16 @@ func (s Service) handleCompute(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	token := r.FormValue("token")
+
 	home, work, fields := s.geocodeAddresses(ctx, r)
+
+	fields["distance"] = templ.Field{Value: r.FormValue("distance")}
+
+	distance, err := strconv.ParseFloat(fields["distance"].Value, 64)
+	if err != nil {
+		httperror.BadRequest(ctx, w, fmt.Errorf("parse distance: %w", err))
+		return
+	}
 
 	if fields.HasError() {
 		templ.DisplayForm(ctx, w, s.uri, token, fields)
@@ -104,7 +114,7 @@ func (s Service) handleCompute(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	commutes, err := getCommutes(rides, home, work)
+	commutes, err := getCommutes(rides, home, work, distance/1000)
 	if err != nil {
 		httperror.InternalServerError(ctx, w, err)
 		return
