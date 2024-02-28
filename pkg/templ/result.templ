@@ -1,6 +1,7 @@
 package templ
 
 import "github.com/ViBiOh/strava/pkg/model"
+import "strconv"
 
 templ Result(uri, nonce, title, staticImageURL string, commutes model.Commutes) {
   @Root(uri, nonce, title) {
@@ -8,5 +9,8 @@ templ Result(uri, nonce, title, staticImageURL string, commutes model.Commutes) 
     <pre>
       { commutes.String() }
     </pre>
+    <p>
+      Total: { strconv.Itoa(len(commutes)) }
+    </p>
   }
 }

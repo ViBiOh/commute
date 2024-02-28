@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"time"
 
 	"github.com/ViBiOh/httputils/v4/pkg/httperror"
 	"github.com/ViBiOh/httputils/v4/pkg/httpjson"
@@ -56,7 +57,7 @@ func (s Service) handleStravaCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rides, err := s.fetchRides(ctx, token)
+	rides, err := s.fetchRides(ctx, token, time.Time{}, time.Time{})
 	if err != nil {
 		httperror.InternalServerError(ctx, w, err)
 		return
@@ -92,10 +93,18 @@ func (s Service) handleCompute(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	token := r.FormValue("token")
+	rawMonth := r.FormValue("month")
 
 	home, work, fields := s.geocodeAddresses(ctx, r)
 
 	fields["distance"] = templ.Field{Value: r.FormValue("distance")}
+	fields["rawMonth"] = templ.Field{Value: rawMonth}
+
+	month, err := strconv.Atoi(rawMonth)
+	if err != nil {
+		httperror.BadRequest(ctx, w, fmt.Errorf("parse month: %w", err))
+		return
+	}
 
 	distance, err := strconv.ParseFloat(fields["distance"].Value, 64)
 	if err != nil {
@@ -108,7 +117,12 @@ func (s Service) handleCompute(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rides, err := s.fetchRides(ctx, token)
+	now := time.Now()
+
+	after := time.Date(now.Year(), time.Month(month), 1, 0, 0, 0, 0, time.UTC)
+	before := lastDayOfTheMonth(now.Year(), month+1)
+
+	rides, err := s.fetchRides(ctx, token, before, after)
 	if err != nil {
 		httperror.InternalServerError(ctx, w, err)
 		return
@@ -123,10 +137,10 @@ func (s Service) handleCompute(w http.ResponseWriter, r *http.Request) {
 	templ.DisplayResult(ctx, w, s.uri, s.mapboxToken, home, work, commutes)
 }
 
-func (s Service) fetchRides(ctx context.Context, token string) ([]Ride, error) {
+func (s Service) fetchRides(ctx context.Context, token string, before, after time.Time) ([]Ride, error) {
 	requester := request.Get(apiURL).Header("Authorization", fmt.Sprintf("Bearer %s", token))
 
-	activities, err := s.getActivities(ctx, requester)
+	activities, err := s.getActivities(ctx, requester, before, after)
 	if err != nil {
 		return nil, fmt.Errorf("get activities: %w", err)
 	}
@@ -160,4 +174,13 @@ func (s Service) geocodeAddress(ctx context.Context, value string) (coordinates.
 	latLng, field.Value, field.Err = nominatim.GetLatLng(ctx, value)
 
 	return latLng, field
+}
+
+func lastDayOfTheMonth(year, month int) time.Time {
+	if month > 12 {
+		month = 1
+		year++
+	}
+
+	return time.Date(year, time.Month(month), 0, 0, 0, 0, 0, time.UTC)
 }

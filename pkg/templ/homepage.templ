@@ -1,5 +1,8 @@
 package templ
 
+import "strconv"
+import "time"
+
 templ Login(uri, nonce, title, loginURL string) {
   @Root(uri, nonce, title) {
     <a href={ templ.URL(loginURL) }>Connect with Strava</a>
@@ -27,6 +30,19 @@ templ Form(uri, nonce, title, token string, values map[string]Field) {
             { err.Error() }
           </div>
         }
+      </p>
+      <p>
+        <label for="month" class="padding">Month</label>
+        <select id="month" name="month">
+          for i := 1; i <= 12; i++ {
+            <option
+              value={ strconv.Itoa(i) }
+              if values["month"].Value == strconv.Itoa(i) {
+                selected
+              }
+            >{ time.Month(i).String() }</option>
+          }
+        </select>
       </p>
       <p>
         <label for="distance" class="padding">Distance from points in meters</label>
