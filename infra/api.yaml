@@ -25,11 +25,11 @@ spec:
     nameOverride: strava
     image:
       name: vibioh/strava
-      tag: "202402292045" # {"$imagepolicy": "default:flux-strava-api:tag"}
+      tag: "202403011838" # {"$imagepolicy": "default:flux-strava-api:tag"}
     labels:
       tags.datadoghq.com/env: "production"
       tags.datadoghq.com/service: "strava"
-      tags.datadoghq.com/version: "202402292045" # {"$imagepolicy": "default:flux-strava-api:tag"}
+      tags.datadoghq.com/version: "202403011838" # {"$imagepolicy": "default:flux-strava-api:tag"}
     env:
       - name: GOMAXPROCS
         valueFrom:
