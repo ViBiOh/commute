@@ -130,9 +130,13 @@ func (s Service) handleCompute(w http.ResponseWriter, r *http.Request) {
 	}
 
 	now := time.Now()
+	year := now.Year()
+	if month > int(now.Month()) {
+		year--
+	}
 
-	after := time.Date(now.Year(), time.Month(month), 1, 0, 0, 0, 0, time.UTC)
-	before := lastDayOfTheMonth(now.Year(), month+1)
+	after := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
+	before := lastDayOfTheMonth(year, month+1)
 
 	rides, err := s.fetchRides(ctx, token, before, after)
 	if err != nil {
