@@ -2,9 +2,7 @@ package templ
 
 import (
 	"context"
-	"fmt"
 	"net/http"
-	"net/url"
 
 	"github.com/ViBiOh/httputils/v4/pkg/httperror"
 	"github.com/ViBiOh/httputils/v4/pkg/owasp"
@@ -33,30 +31,25 @@ func RenderLogin(ctx context.Context, w http.ResponseWriter, uri, loginURL strin
 	}
 }
 
-func DisplayForm(ctx context.Context, w http.ResponseWriter, uri, token string, fields Fields) {
+func DisplayForm(ctx context.Context, w http.ResponseWriter, uri, token, clusters string, places []Place) {
 	nonce := owasp.Nonce()
 	owasp.WriteNonce(w, nonce)
 
 	telemetry.SetRouteTag(ctx, "form")
 
-	component := Form(uri, nonce, title, token, fields)
+	component := Form(uri, nonce, title, token, clusters, places)
 	if err := component.Render(ctx, w); err != nil {
 		httperror.InternalServerError(ctx, w, err)
 	}
 }
 
-func DisplayResult(ctx context.Context, w http.ResponseWriter, uri string, mapboxToken string, home, work coordinates.LatLng, commutes model.Commutes) {
+func DisplayResult(ctx context.Context, w http.ResponseWriter, uri string, staticMap string, home, work coordinates.LatLng, commutes model.Commutes) {
 	nonce := owasp.Nonce()
 	owasp.WriteNonce(w, nonce)
 
 	telemetry.SetRouteTag(ctx, "result")
 
-	staticValues := url.Values{}
-	staticValues.Add("access_token", mapboxToken)
-
-	staticImageURL := fmt.Sprintf("https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/pin-s-home+669c35(%s),pin-s+0061ff(%s)/auto/400x300@2x?%s", home.LngLat(), work.LngLat(), staticValues.Encode())
-
-	component := Result(uri, nonce, title, staticImageURL, commutes)
+	component := Result(uri, nonce, title, staticMap, commutes)
 	if err := component.Render(ctx, w); err != nil {
 		httperror.InternalServerError(ctx, w, err)
 	}

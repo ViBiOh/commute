@@ -24,39 +24,20 @@ type Ride struct {
 	commute bool
 }
 
-func getClusters(rides []Ride) []coordinates.LatLng {
-	var coords []coordinates.LatLng
-	for _, ride := range rides {
-		coords = append(coords, ride.start)
-		coords = append(coords, ride.end)
+type Rides []Ride
+
+func (r Rides) Coordinates() coordinates.List {
+	coords := make(coordinates.List, len(r)*2)
+
+	for index, ride := range r {
+		coords[index*2] = ride.start
+		coords[index*2+1] = ride.end
 	}
 
-	var groups []coordinates.LatLng
-
-	for len(coords) > 0 {
-		var nextCoords []coordinates.LatLng
-
-		current := coords[0]
-		currentGroup := []coordinates.LatLng{current}
-
-		for i := 1; i < len(coords); i++ {
-			following := coords[i]
-
-			if current.IsWithin(following, 0.5) {
-				currentGroup = append(currentGroup, following)
-			} else {
-				nextCoords = append(nextCoords, following)
-			}
-		}
-
-		groups = append(groups, coordinates.Center(currentGroup...))
-		coords = nextCoords
-	}
-
-	return groups
+	return coords
 }
 
-func getRides(activities []Activity) ([]Ride, error) {
+func getRides(activities []Activity) (Rides, error) {
 	var output []Ride
 
 	for _, activity := range activities {
@@ -97,14 +78,10 @@ func getRides(activities []Activity) ([]Ride, error) {
 	return output, nil
 }
 
-func getCommutes(rides []Ride, home, work coordinates.LatLng, distance float64) (model.Commutes, error) {
+func getCommutes(rides Rides, home, work coordinates.LatLng, distance float64) (model.Commutes, error) {
 	roundTrips := model.Commutes{}
 
 	for _, ride := range rides {
-		if weekday := ride.date.Weekday(); weekday < 0 || weekday > 5 {
-			continue
-		}
-
 		day := ride.date.Format(time.DateOnly)
 
 		if ride.start.IsWithin(home, distance) {

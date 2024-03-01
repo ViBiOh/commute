@@ -27,11 +27,13 @@ func (c Commutes) String() string {
 		var confidence string
 
 		if status&Commute != 1 || status&All != 1 {
-			confidence = "Nice ride 🚲"
+			confidence = "🚲"
 		} else if status&Home != 1 {
 			confidence = "Work from home"
 		} else if status&Work != 1 {
 			confidence = "Not from home"
+		} else {
+			confidence = "Not sure"
 		}
 
 		item := fmt.Sprintf("%s | %05b | %s", date, status, confidence)

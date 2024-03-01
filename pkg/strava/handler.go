@@ -17,6 +17,8 @@ import (
 	"github.com/ViBiOh/strava/pkg/templ"
 )
 
+const defaultDistance = 1.0
+
 func (s Service) Handle() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -63,9 +65,24 @@ func (s Service) handleStravaCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	getClusters(rides)
+	clusters := rides.Coordinates().Clusters(defaultDistance)
 
-	templ.DisplayForm(ctx, w, s.uri, token, nil)
+	places := make([]templ.Place, len(clusters))
+
+	for index, cluster := range clusters {
+		name, err := nominatim.Reverse(ctx, cluster)
+		if err != nil {
+			httperror.InternalServerError(ctx, w, fmt.Errorf("reverse geocode `%f`: %w", cluster, err))
+			return
+		}
+
+		places[index] = templ.Place{
+			Coordinates: cluster,
+			Name:        name,
+		}
+	}
+
+	templ.DisplayForm(ctx, w, s.uri, token, s.getMapboxStaticImage(clusters...), places)
 }
 
 func (s Service) exchangeToken(ctx context.Context, r *http.Request) (string, error) {
@@ -93,27 +110,22 @@ func (s Service) handleCompute(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	token := r.FormValue("token")
-	rawMonth := r.FormValue("month")
 
-	home, work, fields := s.geocodeAddresses(ctx, r)
-
-	fields["distance"] = templ.Field{Value: r.FormValue("distance")}
-	fields["rawMonth"] = templ.Field{Value: rawMonth}
-
-	month, err := strconv.Atoi(rawMonth)
+	month, err := strconv.Atoi(r.FormValue("month"))
 	if err != nil {
 		httperror.BadRequest(ctx, w, fmt.Errorf("parse month: %w", err))
 		return
 	}
 
-	distance, err := strconv.ParseFloat(fields["distance"].Value, 64)
+	home, err := coordinates.ParseLatLng(r.FormValue("home"))
 	if err != nil {
-		httperror.BadRequest(ctx, w, fmt.Errorf("parse distance: %w", err))
+		httperror.BadRequest(ctx, w, fmt.Errorf("parse home: %w", err))
 		return
 	}
 
-	if fields.HasError() {
-		templ.DisplayForm(ctx, w, s.uri, token, fields)
+	work, err := coordinates.ParseLatLng(r.FormValue("work"))
+	if err != nil {
+		httperror.BadRequest(ctx, w, fmt.Errorf("parse work: %w", err))
 		return
 	}
 
@@ -128,16 +140,16 @@ func (s Service) handleCompute(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	commutes, err := getCommutes(rides, home, work, distance/1000)
+	commutes, err := getCommutes(rides, home, work, defaultDistance)
 	if err != nil {
 		httperror.InternalServerError(ctx, w, err)
 		return
 	}
 
-	templ.DisplayResult(ctx, w, s.uri, s.mapboxToken, home, work, commutes)
+	templ.DisplayResult(ctx, w, s.uri, s.getMapboxStaticImage(home, work), home, work, commutes)
 }
 
-func (s Service) fetchRides(ctx context.Context, token string, before, after time.Time) ([]Ride, error) {
+func (s Service) fetchRides(ctx context.Context, token string, before, after time.Time) (Rides, error) {
 	requester := request.Get(apiURL).Header("Authorization", fmt.Sprintf("Bearer %s", token))
 
 	activities, err := s.getActivities(ctx, requester, before, after)
@@ -151,29 +163,6 @@ func (s Service) fetchRides(ctx context.Context, token string, before, after tim
 	}
 
 	return rides, nil
-}
-
-func (s Service) geocodeAddresses(ctx context.Context, r *http.Request) (coordinates.LatLng, coordinates.LatLng, templ.Fields) {
-	fields := templ.Fields{}
-
-	var home, work coordinates.LatLng
-
-	home, fields["home"] = s.geocodeAddress(ctx, r.FormValue("home"))
-	work, fields["work"] = s.geocodeAddress(ctx, r.FormValue("work"))
-
-	return home, work, fields
-}
-
-func (s Service) geocodeAddress(ctx context.Context, value string) (coordinates.LatLng, templ.Field) {
-	field := templ.Field{
-		Value: value,
-	}
-
-	var latLng coordinates.LatLng
-
-	latLng, field.Value, field.Err = nominatim.GetLatLng(ctx, value)
-
-	return latLng, field
 }
 
 func lastDayOfTheMonth(year, month int) time.Time {

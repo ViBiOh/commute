@@ -76,20 +76,50 @@ func degreesToRadians(degrees float64) float64 {
 	return degrees * math.Pi / 180
 }
 
-func Center(coords ...LatLng) LatLng {
-	if len(coords) == 0 {
+type List []LatLng
+
+func (l List) Center() LatLng {
+	if len(l) == 0 {
 		return LatLng{}
 	}
 
 	var output LatLng
 
-	for _, coord := range coords {
+	for _, coord := range l {
 		output[0] += coord[0]
 		output[1] += coord[1]
 	}
 
-	output[0] = output[0] / float64(len(coords))
-	output[1] = output[1] / float64(len(coords))
+	output[0] = output[0] / float64(len(l))
+	output[1] = output[1] / float64(len(l))
 
 	return output
+}
+
+func (l List) Clusters(distance float64) List {
+	var groups List
+
+	var coords List = l
+
+	for len(coords) > 0 {
+		var next List
+
+		current := coords[0]
+		group := List{current}
+
+		for i := 1; i < len(coords); i++ {
+			following := coords[i]
+
+			if current.IsWithin(following, distance) {
+				group = append(group, following)
+			} else {
+				next = append(next, following)
+			}
+		}
+
+		groups = append(groups, group.Center())
+		coords = next
+	}
+
+	return groups
 }

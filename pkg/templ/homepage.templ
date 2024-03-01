@@ -9,27 +9,34 @@ templ Login(uri, nonce, title, loginURL string) {
   }
 }
 
-templ Form(uri, nonce, title, token string, values map[string]Field) {
+templ Form(uri, nonce, title, token, staticMap string, places []Place) {
   @Root(uri, nonce, title) {
     <form method="POST" action="/api/compute">
       <input type="hidden" name="token" value={ token }/>
+      <img src={ staticMap } alt="Static image of found cluters"/>
       <p>
         <label for="home" class="padding">Home</label>
-        <input id="home" name="home" type="text" value={ values["home"].Value }/>
-        if err := values["home"].Err; err != nil {
-          <div class="bg-danger">
-            { err.Error() }
-          </div>
-        }
+        <select id="home" name="home">
+          for index, place := range places {
+            if index == 0 {
+              <option selected value={ place.Coordinates.String() }>{ place.Name }</option>
+            } else {
+              <option value={ place.Coordinates.String() }>{ place.Name }</option>
+            }
+          }
+        </select>
       </p>
       <p>
         <label for="work" class="padding">Work</label>
-        <input id="work" name="work" type="text" value={ values["work"].Value }/>
-        if err := values["home"].Err; err != nil {
-          <div class="bg-danger">
-            { err.Error() }
-          </div>
-        }
+        <select id="work" name="work">
+          for index, place := range places {
+            if index == 1 {
+              <option selected value={ place.Coordinates.String() }>{ place.Name }</option>
+            } else {
+              <option value={ place.Coordinates.String() }>{ place.Name }</option>
+            }
+          }
+        </select>
       </p>
       <p>
         <label for="month" class="padding">Month</label>
@@ -37,52 +44,11 @@ templ Form(uri, nonce, title, token string, values map[string]Field) {
           for i := 1; i <= 12; i++ {
             <option
               value={ strconv.Itoa(i) }
-              if values["month"].Value == strconv.Itoa(i) {
+              if int(time.Now().Month()) == i {
                 selected
               }
             >{ time.Month(i).String() }</option>
           }
-        </select>
-      </p>
-      <p>
-        <label for="distance" class="padding">Distance from points in meters</label>
-        <select id="distance" name="distance">
-          <option
-            value="250"
-            if values["distance"].Value == "250" {
-              selected
-            }
-          >250</option>
-          <option
-            value="500"
-            if values["distance"].Value == "500" || len(values["distance"].Value) == 0 {
-              selected
-            }
-          >500</option>
-          <option
-            value="750"
-            if values["distance"].Value == "750" {
-              selected
-            }
-          >750</option>
-          <option
-            value="1000"
-            if values["distance"].Value == "1000" {
-              selected
-            }
-          >1000</option>
-          <option
-            value="1250"
-            if values["distance"].Value == "1250" {
-              selected
-            }
-          >1250</option>
-          <option
-            value="1500"
-            if values["distance"].Value == "1500" {
-              selected
-            }
-          >1500</option>
         </select>
       </p>
       <p>

@@ -17,13 +17,13 @@ var (
 	ErrNotFound = errors.New("no address found")
 )
 
-type SearchResponse struct {
+type Response struct {
 	Lat         string `json:"lat"`
 	Lon         string `json:"lon"`
 	DisplayName string `json:"display_name"`
 }
 
-func GetLatLng(ctx context.Context, query string) (coordinates.LatLng, string, error) {
+func Geocode(ctx context.Context, query string) (coordinates.LatLng, string, error) {
 	urlQuery := url.Values{}
 	urlQuery.Add("format", "json")
 	urlQuery.Add("q", query)
@@ -33,7 +33,7 @@ func GetLatLng(ctx context.Context, query string) (coordinates.LatLng, string, e
 		return coordinates.LatLng{}, "", fmt.Errorf("search: %w", err)
 	}
 
-	var responses []SearchResponse
+	var responses []Response
 	if err := httpjson.Read(resp, &responses); err != nil {
 		return coordinates.LatLng{}, "", fmt.Errorf("parse: %w", err)
 	}
@@ -53,4 +53,24 @@ func GetLatLng(ctx context.Context, query string) (coordinates.LatLng, string, e
 	}
 
 	return coordinates.LatLng{lat, lng}, responses[0].DisplayName, nil
+}
+
+func Reverse(ctx context.Context, coord coordinates.LatLng) (string, error) {
+	urlQuery := url.Values{}
+	urlQuery.Add("format", "json")
+	urlQuery.Add("zoom", "16") // borough
+	urlQuery.Add("lat", fmt.Sprintf("%f", coord[0]))
+	urlQuery.Add("lon", fmt.Sprintf("%f", coord[1]))
+
+	resp, err := requester.Path("/reverse?"+urlQuery.Encode()).Send(ctx, nil)
+	if err != nil {
+		return "", fmt.Errorf("reverse: %w", err)
+	}
+
+	var response Response
+	if err := httpjson.Read(resp, &response); err != nil {
+		return "", fmt.Errorf("parse: %w", err)
+	}
+
+	return response.DisplayName, nil
 }
