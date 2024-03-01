@@ -96,7 +96,7 @@ func Form(uri, nonce, title, token, staticMap string, places []Place) templ.Comp
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" alt=\"Static image of found cluters\"><p><label for=\"home\" class=\"padding\">Home</label> <select id=\"home\" name=\"home\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"max-full\" alt=\"Static image of found cluters\"><p><label for=\"home\" class=\"padding\">Home</label> <select id=\"home\" name=\"home\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -155,7 +155,7 @@ func Form(uri, nonce, title, token, staticMap string, places []Place) templ.Comp
 					}
 				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</select></p><p><label for=\"work\" class=\"padding\">Work</label> <select id=\"work\" name=\"work\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</select></p><p><label for=\"work\" class=\"padding\">Work</label> <select id=\"work\" class=\"max-full\" name=\"work\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -214,7 +214,7 @@ func Form(uri, nonce, title, token, staticMap string, places []Place) templ.Comp
 					}
 				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</select></p><p><label for=\"month\" class=\"padding\">Month</label> <select id=\"month\" name=\"month\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</select></p><p><label for=\"month\" class=\"padding\">Month</label> <select id=\"month\" class=\"max-full\" name=\"month\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

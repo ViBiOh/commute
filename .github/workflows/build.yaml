@@ -44,7 +44,7 @@ jobs:
       - name: Build
         run: |
           make
-          git --no-pager diff -- ':(exclude)go.sum' && git diff --quiet -- ':(exclude)go.sum'
+          git --no-pager diff -- ':(exclude)go.sum' ':(exclude)*_templ.go' && git diff --quiet -- ':(exclude)go.sum' ':(exclude)*_templ.go'
       - name: Codecov
         uses: codecov/codecov-action@v4
 

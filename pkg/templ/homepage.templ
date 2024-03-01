@@ -13,7 +13,7 @@ templ Form(uri, nonce, title, token, staticMap string, places []Place) {
   @Root(uri, nonce, title) {
     <form method="POST" action="/api/compute">
       <input type="hidden" name="token" value={ token }/>
-      <img src={ staticMap } alt="Static image of found cluters"/>
+      <img src={ staticMap } class="max-full" alt="Static image of found cluters"/>
       <p>
         <label for="home" class="padding">Home</label>
         <select id="home" name="home">
@@ -28,7 +28,7 @@ templ Form(uri, nonce, title, token, staticMap string, places []Place) {
       </p>
       <p>
         <label for="work" class="padding">Work</label>
-        <select id="work" name="work">
+        <select id="work" class="max-full" name="work">
           for index, place := range places {
             if index == 1 {
               <option selected value={ place.Coordinates.String() }>{ place.Name }</option>
@@ -40,7 +40,7 @@ templ Form(uri, nonce, title, token, staticMap string, places []Place) {
       </p>
       <p>
         <label for="month" class="padding">Month</label>
-        <select id="month" name="month">
+        <select id="month" class="max-full" name="month">
           for i := 1; i <= 12; i++ {
             <option
               value={ strconv.Itoa(i) }

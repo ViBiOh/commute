@@ -5,7 +5,7 @@ import "strconv"
 
 templ Result(uri, nonce, title, staticImageURL string, commutes model.Commutes) {
   @Root(uri, nonce, title) {
-    <img src={ staticImageURL } alt="Static image of home and work"/>
+    <img src={ staticImageURL } class="max-full" alt="Static image of home and work"/>
     <pre>
       { commutes.String() }
     </pre>
