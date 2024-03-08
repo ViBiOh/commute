@@ -51,7 +51,7 @@ spec:
       OTEL_RESOURCE_ATTRIBUTES: env=production,git.repository_url=github.com/ViBiOh/strava
       STRAVA_LOGGER_JSON: "true"
       STRAVA_MAPBOX_ACCESS_TOKEN: pk.eyJ1IjoidmliaW9oIiwiYSI6ImNqMzFmbTFoOTAwMWMycW82YXppbGRidXAifQ.bb6xyGsr1kQW3UozHS2Pmw
-      STRAVA_PUBLIC_URL: https://strava.vibioh.fr
+      STRAVA_PUBLIC_URL: https://commute.vibioh.fr
       STRAVA_TELEMETRY_URL: datadog.observability:4317
     secrets:
       STRAVA_CLIENT_ID: AgAzHYRL/0Aae2tc4ewealxemxNJ5Wor5roBiVzYi3TXbexG1sfmsXsYBSoar7Qif+sLo4ru+r0dYNsZFvxApSA7pB3WVRdS1cfiSubf15mojkloz5/1fCLpxuXHlHm3idwObBiaevPlOtaL+sJuFKY9VGOhQjeMq8kZSxqKYYQ7jKDx2/vrO/Orv89OM7v/dDRLxf/AQqn3iDfLtmju0wtiFKia4W+JtaOAOn3eo/56R8QsuqeZfHiZWfTBmgZ37ZUQWAfbULxTvAf8TbFJICuklg9bATr4Hpcta7A4yVjyS7uS9188o1d+wZtOpLVQqEOr6kdMQmKMEmXCleWM2JgVHzb49addKxj89MiY1z0au63SGQiZzVGvEWxw0b7CxKNU4/ZBjodMCEOU2oV1BZ3jmEst6yy539mcNGkEi743/DBWdsy3cSld1/4CqBN1MVQMrlqqaQyva7gukSIWS9jQlIcfMVSUy6bqF91ABdZ7S8Z0XI9llI5W5wQLy9LkLDA9fYcHfhsyx56/yAKTZNz88exezRYGZth2cSuiPxBIbL4BZToLKbEWv1N6B6E0CNLG0an4w5JQnDRFdzUpbgS1feosVQpv+aosqG/Ai2rlh27rt3mP7sOSVl6lO2cnQfKKgWQ10BjlvKR+U7NMMq4Gr6w0jPmQB8LApmnG3gIvmGYOHq0vFeLwwoN3tp67QIDK4Eq2S0U=
