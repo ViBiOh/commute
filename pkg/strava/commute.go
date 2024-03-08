@@ -1,7 +1,9 @@
 package strava
 
 import (
+	"context"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/ViBiOh/strava/pkg/coordinates"
@@ -59,11 +61,13 @@ func getRides(activities []Activity) (Rides, error) {
 
 		start, err := coordinates.NewLatLng(activity.StartLatlng)
 		if err != nil {
+			slog.LogAttrs(context.Background(), slog.LevelError, "unable to parse start", slog.Any("error", err), slog.Any("activity", activity))
 			return nil, fmt.Errorf("parse start: %w", err)
 		}
 
 		end, err := coordinates.NewLatLng(activity.EndLatlng)
 		if err != nil {
+			slog.LogAttrs(context.Background(), slog.LevelError, "unable to parse end", slog.Any("error", err), slog.Any("activity", activity))
 			return nil, fmt.Errorf("parse end: %w", err)
 		}
 
