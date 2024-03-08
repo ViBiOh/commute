@@ -1,9 +1,11 @@
-package strava
+package mapbox
 
 import (
+	"flag"
 	"fmt"
 	"strings"
 
+	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/strava/pkg/coordinates"
 )
 
@@ -16,7 +18,29 @@ var colors = []string{
 	"aa7942", // brown
 }
 
-func (s Service) getMapboxStaticImage(coords ...coordinates.LatLng) string {
+type Service struct {
+	token string
+}
+
+type Config struct {
+	Token string
+}
+
+func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) *Config {
+	var config Config
+
+	flags.New("AccessToken", "Mapbox Access Token").Prefix(prefix).DocPrefix("mapbox").StringVar(fs, &config.Token, "", nil)
+
+	return &config
+}
+
+func New(config *Config) Service {
+	return Service{
+		token: config.Token,
+	}
+}
+
+func (s Service) StaticImage(coords ...coordinates.LatLng) string {
 	var builder strings.Builder
 	builder.WriteString("https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/")
 
@@ -29,7 +53,7 @@ func (s Service) getMapboxStaticImage(coords ...coordinates.LatLng) string {
 	}
 
 	builder.WriteString("/auto/400x300@2x?access_token=")
-	builder.WriteString(s.mapboxToken)
+	builder.WriteString(s.token)
 
 	return builder.String()
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/request"
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 	"github.com/ViBiOh/strava/pkg/coordinates"
+	"github.com/ViBiOh/strava/pkg/model"
 	"github.com/ViBiOh/strava/pkg/nominatim"
 	"github.com/ViBiOh/strava/pkg/templ"
 )
@@ -82,7 +83,7 @@ func (s Service) handleStravaCallback(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	templ.DisplayForm(ctx, w, s.uri, token, s.getMapboxStaticImage(clusters...), places)
+	templ.DisplayForm(ctx, w, s.uri, token, s.mapbox.StaticImage(clusters...), places)
 }
 
 func (s Service) exchangeToken(ctx context.Context, r *http.Request) (string, error) {
@@ -144,16 +145,16 @@ func (s Service) handleCompute(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	commutes, err := getCommutes(rides, home, work, defaultDistance)
+	commutes, err := rides.ToCommutes(home, work, defaultDistance)
 	if err != nil {
 		httperror.InternalServerError(ctx, w, err)
 		return
 	}
 
-	templ.DisplayResult(ctx, w, s.uri, s.getMapboxStaticImage(home, work), home, work, commutes)
+	templ.DisplayResult(ctx, w, s.uri, s.mapbox.StaticImage(home, work), home, work, commutes)
 }
 
-func (s Service) fetchRides(ctx context.Context, token string, before, after time.Time) (Rides, error) {
+func (s Service) fetchRides(ctx context.Context, token string, before, after time.Time) (model.Rides, error) {
 	requester := request.Get(apiURL).Header("Authorization", fmt.Sprintf("Bearer %s", token))
 
 	activities, err := s.getActivities(ctx, requester, before, after)
@@ -161,7 +162,7 @@ func (s Service) fetchRides(ctx context.Context, token string, before, after tim
 		return nil, fmt.Errorf("get activities: %w", err)
 	}
 
-	rides, err := getRides(activities)
+	rides, err := toRides(activities)
 	if err != nil {
 		return nil, fmt.Errorf("get rides: %w", err)
 	}

@@ -12,6 +12,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/owasp"
 	"github.com/ViBiOh/httputils/v4/pkg/server"
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
+	"github.com/ViBiOh/strava/pkg/mapbox"
 	"github.com/ViBiOh/strava/pkg/strava"
 )
 
@@ -25,6 +26,7 @@ type configuration struct {
 	health    *health.Config
 
 	strava    *strava.Config
+	mapbox    *mapbox.Config
 	publicURL *string
 }
 
@@ -42,6 +44,7 @@ func newConfig() (configuration, error) {
 		cors:      cors.Flags(fs, "cors"),
 
 		strava:    strava.Flags(fs, ""),
+		mapbox:    mapbox.Flags(fs, "mapbox"),
 		publicURL: flags.New("PublicURL", "Public URL for redirection").String(fs, "http://localhost:1080", nil),
 	}, fs.Parse(os.Args[1:])
 }

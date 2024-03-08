@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/ViBiOh/flags"
+	"github.com/ViBiOh/strava/pkg/mapbox"
 )
 
 const (
@@ -13,8 +14,8 @@ const (
 )
 
 type Service struct {
+	mapbox       mapbox.Service
 	uri          string
-	mapboxToken  string
 	clientID     string
 	clientSecret string
 }
@@ -22,7 +23,6 @@ type Service struct {
 type Config struct {
 	ClientID     string
 	ClientSecret string
-	MapboxToken  string
 }
 
 func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) *Config {
@@ -30,15 +30,14 @@ func Flags(fs *flag.FlagSet, prefix string, overrides ...flags.Override) *Config
 
 	flags.New("ClientID", "App Client ID").DocPrefix("strava").StringVar(fs, &config.ClientID, "", nil)
 	flags.New("ClientSecret", "App Client Secret").DocPrefix("strava").StringVar(fs, &config.ClientSecret, "", nil)
-	flags.New("AccessToken", "Mapbox Access Token").DocPrefix("mapbox").StringVar(fs, &config.MapboxToken, "", nil)
 
 	return &config
 }
 
-func New(config *Config, uri string) Service {
+func New(config *Config, uri string, mapboxService mapbox.Service) Service {
 	return Service{
+		mapbox:       mapboxService,
 		uri:          uri,
-		mapboxToken:  config.MapboxToken,
 		clientID:     config.ClientID,
 		clientSecret: config.ClientSecret,
 	}
