@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/ViBiOh/strava/pkg/commute"
-	"github.com/ViBiOh/strava/pkg/mapbox"
-	"github.com/ViBiOh/strava/pkg/strava"
+	"github.com/ViBiOh/commute/pkg/commute"
+	"github.com/ViBiOh/commute/pkg/mapbox"
+	"github.com/ViBiOh/commute/pkg/strava"
 )
 
 type service struct {

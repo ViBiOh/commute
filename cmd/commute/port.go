@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/ViBiOh/strava/pkg/templ"
+	"github.com/ViBiOh/commute/pkg/templ"
 )
 
 func newPort(config configuration, service service) http.Handler {

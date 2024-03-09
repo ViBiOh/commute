@@ -7,13 +7,13 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/ViBiOh/commute/pkg/coordinates"
+	"github.com/ViBiOh/commute/pkg/mapbox"
+	"github.com/ViBiOh/commute/pkg/model"
+	"github.com/ViBiOh/commute/pkg/nominatim"
+	"github.com/ViBiOh/commute/pkg/templ"
 	"github.com/ViBiOh/httputils/v4/pkg/httperror"
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
-	"github.com/ViBiOh/strava/pkg/coordinates"
-	"github.com/ViBiOh/strava/pkg/mapbox"
-	"github.com/ViBiOh/strava/pkg/model"
-	"github.com/ViBiOh/strava/pkg/nominatim"
-	"github.com/ViBiOh/strava/pkg/templ"
 )
 
 const defaultDistance = 1.0

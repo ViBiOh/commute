@@ -7,9 +7,9 @@ import (
 	"net/url"
 	"strconv"
 
+	"github.com/ViBiOh/commute/pkg/coordinates"
 	"github.com/ViBiOh/httputils/v4/pkg/httpjson"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
-	"github.com/ViBiOh/strava/pkg/coordinates"
 )
 
 var (

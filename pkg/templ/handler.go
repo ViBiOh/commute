@@ -4,11 +4,11 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/ViBiOh/commute/pkg/coordinates"
+	"github.com/ViBiOh/commute/pkg/model"
 	"github.com/ViBiOh/httputils/v4/pkg/httperror"
 	"github.com/ViBiOh/httputils/v4/pkg/owasp"
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
-	"github.com/ViBiOh/strava/pkg/coordinates"
-	"github.com/ViBiOh/strava/pkg/model"
 )
 
 const title = "Compute Indemnites Kilométriques Vélo"

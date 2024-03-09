@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/ViBiOh/commute/pkg/coordinates"
 	"github.com/ViBiOh/flags"
-	"github.com/ViBiOh/strava/pkg/coordinates"
 )
 
 var colors = []string{

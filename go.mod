@@ -1,4 +1,4 @@
-module github.com/ViBiOh/strava
+module github.com/ViBiOh/commute
 
 go 1.22
 

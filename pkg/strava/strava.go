@@ -9,11 +9,11 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/ViBiOh/commute/pkg/coordinates"
+	"github.com/ViBiOh/commute/pkg/model"
 	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/httpjson"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
-	"github.com/ViBiOh/strava/pkg/coordinates"
-	"github.com/ViBiOh/strava/pkg/model"
 	"github.com/twpayne/go-polyline"
 )
 

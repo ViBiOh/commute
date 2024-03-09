@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"github.com/ViBiOh/strava/pkg/coordinates"
+	"github.com/ViBiOh/commute/pkg/coordinates"
 )
 
 const (

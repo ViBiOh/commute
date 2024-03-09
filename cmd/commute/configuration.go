@@ -4,6 +4,8 @@ import (
 	"flag"
 	"os"
 
+	"github.com/ViBiOh/commute/pkg/mapbox"
+	"github.com/ViBiOh/commute/pkg/strava"
 	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/alcotest"
 	"github.com/ViBiOh/httputils/v4/pkg/cors"
@@ -12,8 +14,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/owasp"
 	"github.com/ViBiOh/httputils/v4/pkg/server"
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
-	"github.com/ViBiOh/strava/pkg/mapbox"
-	"github.com/ViBiOh/strava/pkg/strava"
 )
 
 type configuration struct {

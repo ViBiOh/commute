@@ -1,12 +1,12 @@
 # commute
 
-[![Build](https://github.com/ViBiOh/strava/workflows/Build/badge.svg)](https://github.com/ViBiOh/strava/actions)
-[![codecov](https://codecov.io/gh/ViBiOh/strava/branch/main/graph/badge.svg)](https://codecov.io/gh/ViBiOh/strava)
+[![Build](https://github.com/ViBiOh/commute/workflows/Build/badge.svg)](https://github.com/ViBiOh/commute/actions)
+[![codecov](https://codecov.io/gh/ViBiOh/commute/branch/main/graph/badge.svg)](https://codecov.io/gh/ViBiOh/commute)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ViBiOh_strava&metric=alert_status)](https://sonarcloud.io/dashboard?id=ViBiOh_strava)
 
 ## Getting started
 
-Golang binary is built with static link. You can download it directly from the [GitHub Release page](https://github.com/ViBiOh/strava/releases) or build it by yourself by cloning this repo and running `make`.
+Golang binary is built with static link. You can download it directly from the [GitHub Release page](https://github.com/ViBiOh/commute/releases) or build it by yourself by cloning this repo and running `make`.
 
 A Docker image is available for `amd64`, `arm` and `arm64` platforms on Docker Hub: [vibioh/commute](https://hub.docker.com/r/vibioh/commute/tags).
 
