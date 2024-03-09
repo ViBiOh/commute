@@ -22,7 +22,7 @@ templ Login(uri, nonce, title, loginURL string) {
 
 templ Form(uri, nonce, title, token, staticMap string, places []Place) {
   @Root(uri, nonce, title) {
-    <form method="POST" action="/api/compute">
+    <form method="POST" action="/compute">
       <input type="hidden" name="token" value={ token }/>
       <img src={ staticMap } class="max-full" alt="Static image of found cluters"/>
       <p>

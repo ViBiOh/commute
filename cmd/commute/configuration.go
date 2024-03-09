@@ -31,7 +31,7 @@ type configuration struct {
 }
 
 func newConfig() (configuration, error) {
-	fs := flag.NewFlagSet("strava", flag.ExitOnError)
+	fs := flag.NewFlagSet("commute", flag.ExitOnError)
 	fs.Usage = flags.Usage(fs)
 
 	return configuration{
@@ -43,7 +43,7 @@ func newConfig() (configuration, error) {
 		owasp:     owasp.Flags(fs, "", flags.NewOverride("Csp", "default-src 'self'; base-uri 'self'; script-src 'self'; style-src 'self' 'httputils-nonce'; img-src 'self' api.mapbox.com/styles/v1/mapbox/dark-v11/")),
 		cors:      cors.Flags(fs, "cors"),
 
-		strava:    strava.Flags(fs, ""),
+		strava:    strava.Flags(fs, "strava"),
 		mapbox:    mapbox.Flags(fs, "mapbox"),
 		publicURL: flags.New("PublicURL", "Public URL for redirection").String(fs, "http://localhost:1080", nil),
 	}, fs.Parse(os.Args[1:])

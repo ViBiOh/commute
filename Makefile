@@ -5,10 +5,10 @@ ifneq ("$(wildcard .env)","")
 	export
 endif
 
-APP_NAME = strava
+APP_NAME = commute
 PACKAGES ?= ./...
 
-MAIN_SOURCE = ./cmd/strava/
+MAIN_SOURCE = ./cmd/commute/
 MAIN_RUNNER = go run $(MAIN_SOURCE)
 ifeq ($(DEBUG), true)
 	MAIN_RUNNER = dlv debug $(MAIN_SOURCE) --

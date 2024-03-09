@@ -7,8 +7,8 @@ ENV ZONEINFO /zoneinfo.zip
 COPY zoneinfo.zip /zoneinfo.zip
 COPY ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
-HEALTHCHECK --retries=5 CMD [ "/strava", "-url", "http://localhost:1080/health" ]
-ENTRYPOINT [ "/strava" ]
+HEALTHCHECK --retries=5 CMD [ "/commute", "-url", "http://localhost:1080/health" ]
+ENTRYPOINT [ "/commute" ]
 
 ARG VERSION
 ENV VERSION ${VERSION}
@@ -19,4 +19,4 @@ ENV GIT_SHA ${GIT_SHA}
 ARG TARGETOS
 ARG TARGETARCH
 
-COPY release/strava_${TARGETOS}_${TARGETARCH} /strava
+COPY release/commute_${TARGETOS}_${TARGETARCH} /commute
