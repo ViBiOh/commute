@@ -6,6 +6,7 @@ import (
 
 	"github.com/ViBiOh/commute/pkg/mapbox"
 	"github.com/ViBiOh/commute/pkg/strava"
+	"github.com/ViBiOh/commute/pkg/wahoo"
 	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/alcotest"
 	"github.com/ViBiOh/httputils/v4/pkg/cors"
@@ -26,6 +27,7 @@ type configuration struct {
 	health    *health.Config
 
 	strava    *strava.Config
+	wahoo     *wahoo.Config
 	mapbox    *mapbox.Config
 	publicURL *string
 }
@@ -44,6 +46,7 @@ func newConfig() (configuration, error) {
 		cors:      cors.Flags(fs, "cors"),
 
 		strava:    strava.Flags(fs, "strava"),
+		wahoo:     wahoo.Flags(fs, "wahoo"),
 		mapbox:    mapbox.Flags(fs, "mapbox"),
 		publicURL: flags.New("PublicURL", "Public URL for redirection").String(fs, "http://localhost:1080", nil),
 	}, fs.Parse(os.Args[1:])

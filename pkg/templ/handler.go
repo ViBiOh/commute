@@ -31,13 +31,13 @@ func RenderLogin(ctx context.Context, w http.ResponseWriter, uri, loginURL strin
 	}
 }
 
-func DisplayForm(ctx context.Context, w http.ResponseWriter, uri, token, clusters string, places []Place) {
+func DisplayForm(ctx context.Context, w http.ResponseWriter, uri, provider, token, clusters string, places []Place) {
 	nonce := owasp.Nonce()
 	owasp.WriteNonce(w, nonce)
 
 	telemetry.SetRouteTag(ctx, "form")
 
-	component := Form(uri, nonce, title, token, clusters, places)
+	component := Form(uri, nonce, title, provider, token, clusters, places)
 	if err := component.Render(ctx, w); err != nil {
 		httperror.InternalServerError(ctx, w, err)
 	}

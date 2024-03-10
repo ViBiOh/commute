@@ -1,4 +1,4 @@
-package strava
+package wahoo
 
 import (
 	"context"
@@ -6,21 +6,18 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strconv"
 	"time"
 
-	"github.com/ViBiOh/commute/pkg/coordinates"
 	"github.com/ViBiOh/commute/pkg/model"
 	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/httpjson"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
-	"github.com/twpayne/go-polyline"
 )
 
 const (
-	authURL   = "https://www.strava.com/oauth/authorize"
-	authToken = "https://www.strava.com/oauth/token"
-	apiURL    = "https://www.strava.com/api/v3"
+	authURL   = "https://api.wahooligan.com/oauth/authorize"
+	authToken = "https://api.wahooligan.com/oauth/token"
+	apiURL    = "https://api.wahooligan.com/v1"
 )
 
 type Service struct {
@@ -52,15 +49,14 @@ func New(config *Config, uri string) Service {
 }
 
 func (s Service) ID() string {
-	return "strava"
+	return "wahoo"
 }
 
 func (s Service) LoginURL() string {
 	values := url.Values{}
 	values.Add("client_id", s.clientID)
 	values.Add("response_type", "code")
-	values.Add("scope", "read")
-	values.Add("scope", "activity:read")
+	values.Add("scope", "workouts_read")
 	values.Add("redirect_uri", fmt.Sprintf("%s/token/%s", s.uri, s.ID()))
 
 	return fmt.Sprintf("%s?%s", authURL, values.Encode())
@@ -90,12 +86,14 @@ func (s Service) ExchangeToken(ctx context.Context, r *http.Request) (string, er
 func (s Service) Get(ctx context.Context, token string, before, after time.Time) (model.Rides, error) {
 	requester := request.Get(apiURL).Header("Authorization", fmt.Sprintf("Bearer %s", token))
 
-	activities, err := s.getActivities(ctx, requester, before, after)
+	workouts, err := s.getWorkouts(ctx, requester, before, after)
 	if err != nil {
-		return nil, fmt.Errorf("get activities: %w", err)
+		return nil, fmt.Errorf("get workouts: %w", err)
 	}
 
-	rides, err := toRides(activities)
+	fmt.Println(workouts)
+
+	rides, err := toRides(workouts)
 	if err != nil {
 		return nil, fmt.Errorf("get rides: %w", err)
 	}
@@ -103,24 +101,16 @@ func (s Service) Get(ctx context.Context, token string, before, after time.Time)
 	return rides, nil
 }
 
-func (s Service) getActivities(ctx context.Context, requester request.Request, before, after time.Time) ([]Activity, error) {
+func (s Service) getWorkouts(ctx context.Context, requester request.Request, _, _ time.Time) ([]Workout, error) {
 	params := url.Values{}
 	params.Add("per_page", "100")
 
-	if !before.IsZero() {
-		params.Add("before", strconv.FormatInt(before.Unix(), 10))
-	}
-
-	if !after.IsZero() {
-		params.Add("after", strconv.FormatInt(after.Unix(), 10))
-	}
-
-	resp, err := requester.Path("/athlete/activities?%s", params.Encode()).Send(ctx, nil)
+	resp, err := requester.Path("/workouts?%s", params.Encode()).Send(ctx, nil)
 	if err != nil {
 		return nil, fmt.Errorf("fetch: %w", err)
 	}
 
-	var activities []Activity
+	var activities []Workout
 	if err = httpjson.Read(resp, &activities); err != nil {
 		return nil, err
 	}
@@ -128,43 +118,6 @@ func (s Service) getActivities(ctx context.Context, requester request.Request, b
 	return activities, nil
 }
 
-func toRides(activities []Activity) (model.Rides, error) {
-	var output []model.Ride
-
-	for _, activity := range activities {
-		if activity.Type != "Ride" {
-			continue
-		}
-
-		if len(activity.Map.SummaryPolyline) != 0 {
-			coords, _, err := polyline.DecodeCoords([]byte(activity.Map.SummaryPolyline))
-			if err != nil {
-				return nil, fmt.Errorf("decode polyline: %w", err)
-			}
-
-			if len(coords) > 2 && len(coords[0]) > 0 && len(coords[len(coords)-1]) > 0 {
-				activity.StartLatlng = coords[0]
-				activity.EndLatlng = coords[len(coords)-1]
-			}
-		}
-
-		start, err := coordinates.NewLatLng(activity.StartLatlng)
-		if err != nil {
-			return nil, fmt.Errorf("parse start: %w", err)
-		}
-
-		end, err := coordinates.NewLatLng(activity.EndLatlng)
-		if err != nil {
-			return nil, fmt.Errorf("parse end: %w", err)
-		}
-
-		output = append(output, model.Ride{
-			Date:    activity.StartDate,
-			Start:   start,
-			End:     end,
-			Commute: activity.Commute,
-		})
-	}
-
-	return output, nil
+func toRides(activities []Workout) (model.Rides, error) {
+	return nil, nil
 }

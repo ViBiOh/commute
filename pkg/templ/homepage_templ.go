@@ -71,7 +71,7 @@ func Login(uri, nonce, title, loginURL string) templ.Component {
 	})
 }
 
-func Form(uri, nonce, title, token, staticMap string, places []Place) templ.Component {
+func Form(uri, nonce, title, provider, token, staticMap string, places []Place) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -95,6 +95,14 @@ func Form(uri, nonce, title, token, staticMap string, places []Place) templ.Comp
 				return templ_7745c5c3_Err
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(token))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"> <input type=\"hidden\" name=\"provider\" value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(provider))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -127,7 +135,7 @@ func Form(uri, nonce, title, token, staticMap string, places []Place) templ.Comp
 					var templ_7745c5c3_Var6 string
 					templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(place.Name)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/templ/homepage.templ`, Line: 32, Col: 80}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/templ/homepage.templ`, Line: 33, Col: 80}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 					if templ_7745c5c3_Err != nil {
@@ -153,7 +161,7 @@ func Form(uri, nonce, title, token, staticMap string, places []Place) templ.Comp
 					var templ_7745c5c3_Var7 string
 					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(place.Name)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/templ/homepage.templ`, Line: 34, Col: 71}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/templ/homepage.templ`, Line: 35, Col: 71}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 					if templ_7745c5c3_Err != nil {
@@ -186,7 +194,7 @@ func Form(uri, nonce, title, token, staticMap string, places []Place) templ.Comp
 					var templ_7745c5c3_Var8 string
 					templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(place.Name)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/templ/homepage.templ`, Line: 44, Col: 80}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/templ/homepage.templ`, Line: 45, Col: 80}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 					if templ_7745c5c3_Err != nil {
@@ -212,7 +220,7 @@ func Form(uri, nonce, title, token, staticMap string, places []Place) templ.Comp
 					var templ_7745c5c3_Var9 string
 					templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(place.Name)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/templ/homepage.templ`, Line: 46, Col: 71}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/templ/homepage.templ`, Line: 47, Col: 71}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 					if templ_7745c5c3_Err != nil {
@@ -254,7 +262,7 @@ func Form(uri, nonce, title, token, staticMap string, places []Place) templ.Comp
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(time.Month(i).String())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/templ/homepage.templ`, Line: 60, Col: 37}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/templ/homepage.templ`, Line: 61, Col: 37}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {

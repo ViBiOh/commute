@@ -19,20 +19,26 @@ import (
 const defaultDistance = 1.0
 
 type Provider interface {
+	ID() string
 	ExchangeToken(ctx context.Context, r *http.Request) (string, error)
 	Get(ctx context.Context, token string, before, after time.Time) (model.Rides, error)
 }
 
 type Service struct {
-	provider Provider
-	mapbox   mapbox.Service
-	uri      string
+	providers map[string]Provider
+	mapbox    mapbox.Service
+	uri       string
 }
 
-func New(uri string, provider Provider, mapboxService mapbox.Service) Service {
+func New(uri string, mapboxService mapbox.Service, providers ...Provider) Service {
+	providersIndex := make(map[string]Provider)
+	for _, provider := range providers {
+		providersIndex[provider.ID()] = provider
+	}
+
 	return Service{
-		provider: provider,
-		mapbox:   mapboxService,
+		providers: providersIndex,
+		mapbox:    mapboxService,
 	}
 }
 
@@ -42,13 +48,21 @@ func (s Service) HandleToken() http.Handler {
 
 		telemetry.SetRouteTag(ctx, "token")
 
-		token, err := s.provider.ExchangeToken(ctx, r)
+		providerName := r.PathValue("provider")
+
+		provider, ok := s.providers[providerName]
+		if !ok {
+			httperror.BadRequest(ctx, w, fmt.Errorf("unknown provider `%s`", providerName))
+			return
+		}
+
+		token, err := provider.ExchangeToken(ctx, r)
 		if err != nil {
 			httperror.InternalServerError(ctx, w, err)
 			return
 		}
 
-		rides, err := s.provider.Get(ctx, token, time.Time{}, time.Time{})
+		rides, err := provider.Get(ctx, token, time.Time{}, time.Time{})
 		if err != nil {
 			httperror.InternalServerError(ctx, w, err)
 			return
@@ -70,7 +84,7 @@ func (s Service) HandleToken() http.Handler {
 			}
 		}
 
-		templ.DisplayForm(ctx, w, s.uri, token, s.mapbox.StaticImage(clusters...), places)
+		templ.DisplayForm(ctx, w, s.uri, providerName, token, s.mapbox.StaticImage(clusters...), places)
 	})
 }
 
@@ -81,6 +95,13 @@ func (s Service) HandleCompute() http.Handler {
 		telemetry.SetRouteTag(ctx, "compute")
 
 		token := r.FormValue("token")
+		providerName := r.FormValue("provider")
+
+		provider, ok := s.providers[providerName]
+		if !ok {
+			httperror.BadRequest(ctx, w, fmt.Errorf("unknown provider `%s`", providerName))
+			return
+		}
 
 		month, err := strconv.Atoi(r.FormValue("month"))
 		if err != nil {
@@ -109,7 +130,7 @@ func (s Service) HandleCompute() http.Handler {
 		after := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
 		before := lastDayOfTheMonth(year, month+1)
 
-		rides, err := s.provider.Get(ctx, token, before, after)
+		rides, err := provider.Get(ctx, token, before, after)
 		if err != nil {
 			httperror.InternalServerError(ctx, w, err)
 			return

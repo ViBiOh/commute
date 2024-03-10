@@ -54,6 +54,7 @@ Usage of commute:
   --telemetryUint64               [telemetry] Change OpenTelemetry Trace ID format to an unsigned int 64 ${COMMUTE_TELEMETRY_UINT64} (default true)
   --url                 string    [alcotest] URL to check ${COMMUTE_URL}
   --userAgent           string    [alcotest] User-Agent for check ${COMMUTE_USER_AGENT} (default "Alcotest")
+  --wahooClientID       string    [wahoo] App Client ID ${COMMUTE_WAHOO_CLIENT_ID}
+  --wahooClientSecret   string    [wahoo] App Client Secret ${COMMUTE_WAHOO_CLIENT_SECRET}
   --writeTimeout        duration  [server] Write Timeout ${COMMUTE_WRITE_TIMEOUT} (default 10s)
-
 ```

@@ -20,10 +20,11 @@ templ Login(uri, nonce, title, loginURL string) {
   }
 }
 
-templ Form(uri, nonce, title, token, staticMap string, places []Place) {
+templ Form(uri, nonce, title, provider, token, staticMap string, places []Place) {
   @Root(uri, nonce, title) {
     <form method="POST" action="/compute">
       <input type="hidden" name="token" value={ token }/>
+      <input type="hidden" name="provider" value={ provider }/>
       <img src={ staticMap } class="max-full" alt="Static image of found cluters"/>
       <p>
         <label for="home" class="padding">Home</label>
