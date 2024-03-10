@@ -56,7 +56,7 @@ func (s Service) LoginURL() string {
 	values := url.Values{}
 	values.Add("client_id", s.clientID)
 	values.Add("response_type", "code")
-	values.Add("scope", "workouts_read")
+	values.Add("scope", "workouts_read,plans_read")
 	values.Add("redirect_uri", fmt.Sprintf("%s/token/%s", s.uri, s.ID()))
 
 	return fmt.Sprintf("%s?%s", authURL, values.Encode())
@@ -67,7 +67,7 @@ func (s Service) ExchangeToken(ctx context.Context, r *http.Request) (string, er
 	values.Add("client_id", s.clientID)
 	values.Add("client_secret", s.clientSecret)
 	values.Add("code", r.URL.Query().Get("code"))
-	values.Add("grant+type", "authorization_code")
+	values.Add("grant_type", "authorization_code")
 
 	resp, err := request.Post(authToken).Form(ctx, values)
 	if err != nil {
@@ -118,6 +118,6 @@ func (s Service) getWorkouts(ctx context.Context, requester request.Request, _, 
 	return activities, nil
 }
 
-func toRides(activities []Workout) (model.Rides, error) {
+func toRides(_ []Workout) (model.Rides, error) {
 	return nil, nil
 }
