@@ -7,6 +7,10 @@ type TokenResponse struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
+type WorkoutsResponse struct {
+	Workouts []Workout `json:"workouts"`
+}
+
 type Workout struct {
 	Starts        time.Time `json:"starts"`
 	CreatedAt     time.Time `json:"created_at"`

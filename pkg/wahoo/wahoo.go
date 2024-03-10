@@ -111,12 +111,12 @@ func (s Service) getWorkouts(ctx context.Context, requester request.Request, _, 
 		return nil, fmt.Errorf("fetch: %w", err)
 	}
 
-	var activities []Workout
-	if err = httpjson.Read(resp, &activities); err != nil {
+	var workouts WorkoutsResponse
+	if err = httpjson.Read(resp, &workouts); err != nil {
 		return nil, err
 	}
 
-	return activities, nil
+	return workouts.Workouts, nil
 }
 
 func toRides(_ []Workout) (model.Rides, error) {
