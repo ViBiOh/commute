@@ -92,8 +92,6 @@ func (s Service) Get(ctx context.Context, token string, before, after time.Time)
 		return nil, fmt.Errorf("get workouts: %w", err)
 	}
 
-	fmt.Println(workouts)
-
 	rides, err := toRides(workouts)
 	if err != nil {
 		return nil, fmt.Errorf("get rides: %w", err)
