@@ -68,6 +68,7 @@ func (s Service) ExchangeToken(ctx context.Context, r *http.Request) (string, er
 	values.Add("client_secret", s.clientSecret)
 	values.Add("code", r.URL.Query().Get("code"))
 	values.Add("grant_type", "authorization_code")
+	values.Add("redirect_uri", fmt.Sprintf("%s/token/%s", s.uri, s.ID()))
 
 	resp, err := request.Post(authToken).Form(ctx, values)
 	if err != nil {
