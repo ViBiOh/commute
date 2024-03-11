@@ -149,20 +149,21 @@ func toRides(activities []Activity) (model.Rides, error) {
 		}
 
 		start, err := coordinates.NewLatLng(activity.StartLatlng)
-		if err != nil {
+		if err != nil && !activity.Commute {
 			return nil, fmt.Errorf("parse start: %w", err)
 		}
 
 		end, err := coordinates.NewLatLng(activity.EndLatlng)
-		if err != nil {
+		if err != nil && !activity.Commute {
 			return nil, fmt.Errorf("parse end: %w", err)
 		}
 
 		output = append(output, model.Ride{
-			Date:    activity.StartDate,
-			Start:   start,
-			End:     end,
-			Commute: activity.Commute,
+			Date:     activity.StartDate,
+			Duration: time.Duration(activity.ElapsedTime) * time.Second,
+			Start:    start,
+			End:      end,
+			Commute:  activity.Commute,
 		})
 	}
 

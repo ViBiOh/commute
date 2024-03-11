@@ -15,10 +15,11 @@ const (
 )
 
 type Ride struct {
-	Date    time.Time
-	Start   coordinates.LatLng
-	End     coordinates.LatLng
-	Commute bool
+	Date     time.Time
+	Duration time.Duration
+	Start    coordinates.LatLng
+	End      coordinates.LatLng
+	Commute  bool
 }
 
 type Rides []Ride
