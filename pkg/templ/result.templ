@@ -2,10 +2,11 @@ package templ
 
 import "github.com/ViBiOh/commute/pkg/model"
 import "strconv"
+import "strings"
 
-templ Result(uri, nonce, title, staticImageURL string, commutes model.Commutes) {
+templ Result(uri, nonce, title string, staticMaps []string, commutes model.Commutes) {
   @Root(uri, nonce, title) {
-    <img src={ staticImageURL } class="max-full" alt="Static image of home and work"/>
+    <img src={ staticMaps[0] } srcset={ strings.Join(staticMaps, ", ") } class="max-full" alt="Static image of home and work"/>
     <pre>
       { commutes.String() }
     </pre>

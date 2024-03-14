@@ -40,7 +40,7 @@ func New(config *Config) Service {
 	}
 }
 
-func (s Service) StaticImage(coords ...coordinates.LatLng) string {
+func (s Service) StaticImage(coords ...coordinates.LatLng) []string {
 	var builder strings.Builder
 	builder.WriteString("https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/")
 
@@ -52,8 +52,12 @@ func (s Service) StaticImage(coords ...coordinates.LatLng) string {
 		builder.WriteString(fmt.Sprintf("pin-l-%d+%s(%s)", index+1, colors[index%len(colors)], coord.LngLat()))
 	}
 
-	builder.WriteString("/auto/400x300@2x?access_token=")
-	builder.WriteString(s.token)
+	builder.WriteString("/auto/800x600")
 
-	return builder.String()
+	url := builder.String()
+
+	return []string{
+		url + "?access_token=" + s.token,
+		url + "@2x?access_token=" + s.token + " 2x",
+	}
 }

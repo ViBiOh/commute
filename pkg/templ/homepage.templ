@@ -1,5 +1,6 @@
 package templ
 
+import "strings"
 import "strconv"
 import "time"
 
@@ -20,12 +21,12 @@ templ Login(uri, nonce, title, loginURL string) {
   }
 }
 
-templ Form(uri, nonce, title, provider, token, staticMap string, places []Place) {
+templ Form(uri, nonce, title, provider, token string, staticMaps []string, places []Place) {
   @Root(uri, nonce, title) {
     <form method="POST" action="/compute">
       <input type="hidden" name="token" value={ token }/>
       <input type="hidden" name="provider" value={ provider }/>
-      <img src={ staticMap } class="max-full" alt="Static image of found cluters"/>
+      <img src={ staticMaps[0] } srcset={ strings.Join(staticMaps, ", ") } class="max-full" alt="Static image of found cluters"/>
       <p>
         <label for="home" class="padding">Home</label>
         <select id="home" class="max-full" name="home">

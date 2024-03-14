@@ -31,7 +31,7 @@ func RenderLogin(ctx context.Context, w http.ResponseWriter, uri, loginURL strin
 	}
 }
 
-func DisplayForm(ctx context.Context, w http.ResponseWriter, uri, provider, token, clusters string, places []Place) {
+func DisplayForm(ctx context.Context, w http.ResponseWriter, uri, provider, token string, clusters []string, places []Place) {
 	nonce := owasp.Nonce()
 	owasp.WriteNonce(w, nonce)
 
@@ -43,7 +43,7 @@ func DisplayForm(ctx context.Context, w http.ResponseWriter, uri, provider, toke
 	}
 }
 
-func DisplayResult(ctx context.Context, w http.ResponseWriter, uri string, staticMap string, home, work coordinates.LatLng, commutes model.Commutes) {
+func DisplayResult(ctx context.Context, w http.ResponseWriter, uri string, staticMap []string, home, work coordinates.LatLng, commutes model.Commutes) {
 	nonce := owasp.Nonce()
 	owasp.WriteNonce(w, nonce)
 
