@@ -219,6 +219,10 @@ templ RootStyle(nonce string) {
       flex: 1 1;
     }
 
+    .auto-center {
+     margin: 0 auto;
+    }
+
     .center {
       text-align: center;
     }
@@ -275,7 +279,11 @@ templ RootStyle(nonce string) {
     }
 
     .max-full {
-      max-width: 80rem;
+      max-width: min(100%, 80rem);
+    }
+
+    .commute-cell {
+      width: 8rem;
     }
 
     @media print {

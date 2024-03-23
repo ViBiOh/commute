@@ -159,6 +159,7 @@ func toRides(activities []Activity) (model.Rides, error) {
 		}
 
 		output = append(output, model.Ride{
+			ID:       strconv.Itoa(activity.ID),
 			Date:     activity.StartDate,
 			Duration: time.Duration(activity.ElapsedTime) * time.Second,
 			Start:    start,

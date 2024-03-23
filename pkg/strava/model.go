@@ -38,7 +38,7 @@ type Activity struct {
 	AverageTemp                int       `json:"average_temp,omitempty"`
 	UtcOffset                  float64   `json:"utc_offset"`
 	MaxHeartrate               float64   `json:"max_heartrate,omitempty"`
-	ID                         int64     `json:"id"`
+	ID                         int       `json:"id"`
 	Distance                   float64   `json:"distance"`
 	ElapsedTime                int       `json:"elapsed_time"`
 	AverageSpeed               float64   `json:"average_speed"`

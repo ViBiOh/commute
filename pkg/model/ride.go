@@ -1,24 +1,26 @@
 package model
 
 import (
+	"sort"
 	"time"
 
 	"github.com/ViBiOh/commute/pkg/coordinates"
 )
 
 const (
-	HOME_ARRIVE = 1 << iota
-	WORK_LEAVE
-	WORK_ARRIVE
-	HOME_LEAVE
-	COMMUTE
+	HomeArrive = 1 << iota
+	WorkLeave
+	WorkArrive
+	HomeLeave
+	Commute
 )
 
 type Ride struct {
 	Date     time.Time
-	Duration time.Duration
+	ID       string
 	Start    coordinates.LatLng
 	End      coordinates.LatLng
+	Duration time.Duration
 	Commute  bool
 }
 
@@ -36,31 +38,51 @@ func (r Rides) Coordinates() coordinates.List {
 }
 
 func (r Rides) ToCommutes(home, work coordinates.LatLng, distance float64) (Commutes, error) {
-	roundTrips := Commutes{}
+	roundTrips := make(map[string]*Day)
 
 	for _, ride := range r {
-		day := ride.Date.Format(time.DateOnly)
+		date := ride.Date.Format(time.DateOnly)
+
+		day, ok := roundTrips[date]
+		if !ok {
+			day = &Day{Date: date}
+			roundTrips[date] = day
+		}
+
+		day.IDs = append(day.IDs, ride.ID)
 
 		if ride.Start.IsWithin(home, distance) {
-			roundTrips[day] |= HOME_LEAVE
+			day.Status |= HomeLeave
 		}
 
 		if ride.End.IsWithin(work, distance) {
-			roundTrips[day] |= WORK_ARRIVE
+			day.Status |= WorkArrive
 		}
 
 		if ride.Start.IsWithin(work, distance) {
-			roundTrips[day] |= WORK_LEAVE
+			day.Status |= WorkLeave
 		}
 
 		if ride.End.IsWithin(home, distance) {
-			roundTrips[day] |= HOME_ARRIVE
+			day.Status |= HomeArrive
 		}
 
 		if ride.Commute {
-			roundTrips[day] |= COMMUTE
+			day.Status |= Commute
 		}
 	}
 
-	return roundTrips, nil
+	return toCommutes(roundTrips), nil
+}
+
+func toCommutes(input map[string]*Day) Commutes {
+	output := make([]Day, 0, len(input))
+
+	for _, value := range input {
+		output = append(output, *value)
+	}
+
+	sort.Sort(CommutesByDate(output))
+
+	return output
 }

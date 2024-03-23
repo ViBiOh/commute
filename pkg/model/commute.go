@@ -6,37 +6,34 @@ import (
 	"strings"
 )
 
-type Commutes map[string]uint8
+type Day struct {
+	Date   string
+	IDs    []string
+	Status uint8
+}
+
+type Commutes []Day
+
+// CommutesByDate sort Commutes by Date
+type CommutesByDate Commutes
+
+func (a CommutesByDate) Len() int      { return len(a) }
+func (a CommutesByDate) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a CommutesByDate) Less(i, j int) bool {
+	return a[i].Date < a[j].Date
+}
 
 const (
-	HomeArrive = 1 << iota
-	WorkLeave
-	WorkArrive
-	HomeLeave
-	Commute
-
-	Home = HomeLeave & HomeArrive
-	Work = WorkLeave & WorkArrive
-	All  = Home & Work
+	Home = HomeLeave | HomeArrive
+	Work = WorkLeave | WorkArrive
+	All  = Home | Work
 )
 
 func (c Commutes) String() string {
 	output := make([]string, 0, len(c))
 
-	for date, status := range c {
-		var confidence string
-
-		if status&Commute != 1 || status&All != 1 {
-			confidence = "🚲"
-		} else if status&Home != 1 {
-			confidence = "Work from home"
-		} else if status&Work != 1 {
-			confidence = "Not from home"
-		} else {
-			confidence = "Not sure"
-		}
-
-		item := fmt.Sprintf("%s | %05b | %s", date, status, confidence)
+	for _, day := range c {
+		item := fmt.Sprintf("%s | %05b", day.Date, day.Status)
 
 		index := sort.Search(len(output), func(i int) bool {
 			return output[i] > item
