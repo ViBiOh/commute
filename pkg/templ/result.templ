@@ -23,7 +23,7 @@ templ Result(uri, nonce, title string, staticMaps []string, commutes model.Commu
       for _, commute := range commutes {
         <tr>
           <td>
-            { commute.Date }
+            { commute.Date.Format("Mon _2 Jan 2006") }
             <br/>
             for _, id := range commute.IDs {
               <a

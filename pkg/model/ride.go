@@ -38,10 +38,10 @@ func (r Rides) Coordinates() coordinates.List {
 }
 
 func (r Rides) ToCommutes(home, work coordinates.LatLng, distance float64) (Commutes, error) {
-	roundTrips := make(map[string]*Day)
+	roundTrips := make(map[time.Time]*Day)
 
 	for _, ride := range r {
-		date := ride.Date.Format(time.DateOnly)
+		date := ride.Date.Truncate(time.Hour * 24)
 
 		day, ok := roundTrips[date]
 		if !ok {
@@ -75,7 +75,7 @@ func (r Rides) ToCommutes(home, work coordinates.LatLng, distance float64) (Comm
 	return toCommutes(roundTrips), nil
 }
 
-func toCommutes(input map[string]*Day) Commutes {
+func toCommutes(input map[time.Time]*Day) Commutes {
 	output := make([]Day, 0, len(input))
 
 	for _, value := range input {

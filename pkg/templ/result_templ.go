@@ -71,9 +71,9 @@ func Result(uri, nonce, title string, staticMaps []string, commutes model.Commut
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var5 string
-				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(commute.Date)
+				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(commute.Date.Format("Mon Jan _2 2006"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/templ/result.templ`, Line: 26, Col: 26}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/templ/result.templ`, Line: 26, Col: 52}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {

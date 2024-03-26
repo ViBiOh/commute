@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"time"
 )
 
 type Day struct {
-	Date   string
+	Date   time.Time
 	IDs    []string
 	Status uint8
 }
@@ -20,7 +21,7 @@ type CommutesByDate Commutes
 func (a CommutesByDate) Len() int      { return len(a) }
 func (a CommutesByDate) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 func (a CommutesByDate) Less(i, j int) bool {
-	return a[i].Date < a[j].Date
+	return a[i].Date.Before(a[j].Date)
 }
 
 const (
