@@ -32,11 +32,11 @@ type configuration struct {
 	publicURL *string
 }
 
-func newConfig() (configuration, error) {
+func newConfig() configuration {
 	fs := flag.NewFlagSet("commute", flag.ExitOnError)
 	fs.Usage = flags.Usage(fs)
 
-	return configuration{
+	config := configuration{
 		http:      server.Flags(fs, ""),
 		health:    health.Flags(fs, ""),
 		alcotest:  alcotest.Flags(fs, ""),
@@ -49,5 +49,9 @@ func newConfig() (configuration, error) {
 		wahoo:     wahoo.Flags(fs, "wahoo"),
 		mapbox:    mapbox.Flags(fs, "mapbox"),
 		publicURL: flags.New("PublicURL", "Public URL for redirection").String(fs, "http://localhost:1080", nil),
-	}, fs.Parse(os.Args[1:])
+	}
+
+	_ = fs.Parse(os.Args[1:])
+
+	return config
 }
