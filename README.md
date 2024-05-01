@@ -1,7 +1,6 @@
 # commute
 
 [![Build](https://github.com/ViBiOh/commute/workflows/Build/badge.svg)](https://github.com/ViBiOh/commute/actions)
-[![codecov](https://codecov.io/gh/ViBiOh/commute/branch/main/graph/badge.svg)](https://codecov.io/gh/ViBiOh/commute)
 
 ## Getting started
 
