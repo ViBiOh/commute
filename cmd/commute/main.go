@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"net/http"
 
 	"github.com/ViBiOh/httputils/v4/pkg/alcotest"
 	"github.com/ViBiOh/httputils/v4/pkg/cors"
@@ -15,34 +13,31 @@ import (
 )
 
 func main() {
-	config := newConfig()
-	alcotest.DoAndExit(config.alcotest)
-
-	go func() {
-		fmt.Println(http.ListenAndServe("localhost:9999", http.DefaultServeMux))
-	}()
+	configs := newConfig()
+	alcotest.DoAndExit(configs.alcotest)
 
 	ctx := context.Background()
 
-	client, err := newClient(ctx, config)
+	clients, err := newClient(ctx, configs)
 	logger.FatalfOnErr(ctx, err, "client")
 
-	service := newService(config)
+	defer clients.Close(ctx)
+	go clients.Start()
 
-	defer client.Close(ctx)
+	service := newService(configs)
 
-	httpServer := server.New(config.http)
+	httpServer := server.New(configs.http)
 
-	go httpServer.Start(client.health.EndCtx(), httputils.Handler(
-		newPort(config, service),
-		client.health,
+	go httpServer.Start(clients.health.EndCtx(), httputils.Handler(
+		newPort(configs, service),
+		clients.health,
 		recoverer.Middleware,
-		client.telemetry.Middleware("http"),
-		owasp.New(config.owasp).Middleware,
-		cors.New(config.cors).Middleware,
+		clients.telemetry.Middleware("http"),
+		owasp.New(configs.owasp).Middleware,
+		cors.New(configs.cors).Middleware,
 	))
 
-	client.health.WaitForTermination(httpServer.Done())
+	clients.health.WaitForTermination(httpServer.Done())
 
 	server.GracefulWait(httpServer.Done())
 }

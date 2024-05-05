@@ -13,6 +13,7 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/health"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/owasp"
+	"github.com/ViBiOh/httputils/v4/pkg/pprof"
 	"github.com/ViBiOh/httputils/v4/pkg/server"
 	"github.com/ViBiOh/httputils/v4/pkg/telemetry"
 )
@@ -20,6 +21,7 @@ import (
 type configuration struct {
 	alcotest  *alcotest.Config
 	telemetry *telemetry.Config
+	pprof     *pprof.Config
 	logger    *logger.Config
 	cors      *cors.Config
 	owasp     *owasp.Config
@@ -42,6 +44,7 @@ func newConfig() configuration {
 		alcotest:  alcotest.Flags(fs, ""),
 		logger:    logger.Flags(fs, "logger"),
 		telemetry: telemetry.Flags(fs, "telemetry"),
+		pprof:     pprof.Flags(fs, "pprof"),
 		owasp:     owasp.Flags(fs, "", flags.NewOverride("Csp", "default-src 'self'; base-uri 'self'; script-src 'self'; style-src 'self' 'httputils-nonce'; img-src 'self' api.mapbox.com/styles/v1/mapbox/dark-v11/")),
 		cors:      cors.Flags(fs, "cors"),
 

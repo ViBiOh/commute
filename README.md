@@ -42,6 +42,8 @@ Usage of commute:
   --name                string    [server] Name ${COMMUTE_NAME} (default "http")
   --okStatus            int       [http] Healthy HTTP Status code ${COMMUTE_OK_STATUS} (default 204)
   --port                uint      [server] Listen port (0 to disable) ${COMMUTE_PORT} (default 1080)
+  --pprofAgent          string    [pprof] URL of the Datadog Trace Agent (e.g. http://datadog.observability:8126) ${COMMUTE_PPROF_AGENT}
+  --pprofPort           int       [pprof] Port of the HTTP server (0 to disable) ${COMMUTE_PPROF_PORT} (default 0)
   --publicURL           string    Public URL for redirection ${COMMUTE_PUBLIC_URL} (default "http://localhost:1080")
   --readTimeout         duration  [server] Read Timeout ${COMMUTE_READ_TIMEOUT} (default 5s)
   --shutdownTimeout     duration  [server] Shutdown Timeout ${COMMUTE_SHUTDOWN_TIMEOUT} (default 10s)
