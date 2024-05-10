@@ -8,7 +8,6 @@ import (
 	"github.com/ViBiOh/httputils/v4/pkg/httputils"
 	"github.com/ViBiOh/httputils/v4/pkg/logger"
 	"github.com/ViBiOh/httputils/v4/pkg/owasp"
-	"github.com/ViBiOh/httputils/v4/pkg/recoverer"
 	"github.com/ViBiOh/httputils/v4/pkg/server"
 )
 
@@ -31,7 +30,6 @@ func main() {
 	go httpServer.Start(clients.health.EndCtx(), httputils.Handler(
 		newPort(configs, service),
 		clients.health,
-		recoverer.Middleware,
 		clients.telemetry.Middleware("http"),
 		owasp.New(configs.owasp).Middleware,
 		cors.New(configs.cors).Middleware,
