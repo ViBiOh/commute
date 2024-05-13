@@ -25,11 +25,11 @@ spec:
     nameOverride: commute
     image:
       name: vibioh/commute
-      tag: "202405110012" # {"$imagepolicy": "default:flux-commute-api:tag"}
+      tag: "202405132149" # {"$imagepolicy": "default:flux-commute-api:tag"}
     labels:
       tags.datadoghq.com/env: "production"
       tags.datadoghq.com/service: "commute"
-      tags.datadoghq.com/version: "202405110012" # {"$imagepolicy": "default:flux-commute-api:tag"}
+      tags.datadoghq.com/version: "202405132149" # {"$imagepolicy": "default:flux-commute-api:tag"}
     env:
       - name: GOMAXPROCS
         valueFrom:
