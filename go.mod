@@ -7,7 +7,7 @@ toolchain go1.22.0
 require (
 	github.com/ViBiOh/flags v1.5.0
 	github.com/ViBiOh/httputils/v4 v4.75.5
-	github.com/a-h/templ v0.2.680
+	github.com/a-h/templ v0.2.697
 	github.com/stretchr/testify v1.9.0
 	github.com/twpayne/go-polyline v1.1.1
 )
