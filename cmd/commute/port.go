@@ -6,7 +6,7 @@ import (
 	"github.com/ViBiOh/commute/pkg/templ"
 )
 
-func newPort(config configuration, service service) http.Handler {
+func newPort(config configuration, service services) http.Handler {
 	mux := http.NewServeMux()
 
 	mux.Handle("/token/{provider...}", service.commute.HandleToken())

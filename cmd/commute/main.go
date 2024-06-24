@@ -17,15 +17,15 @@ func main() {
 
 	ctx := context.Background()
 
-	clients, err := newClient(ctx, configs)
+	clients, err := newClients(ctx, configs)
 	logger.FatalfOnErr(ctx, err, "client")
 
 	defer clients.Close(ctx)
 	go clients.Start()
 
-	service := newService(configs)
+	service := newServices(configs)
 
-	httpServer := server.New(configs.http)
+	httpServer := server.New(configs.server)
 
 	go httpServer.Start(clients.health.EndCtx(), httputils.Handler(
 		newPort(configs, service),

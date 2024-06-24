@@ -19,14 +19,15 @@ import (
 )
 
 type configuration struct {
+	logger    *logger.Config
 	alcotest  *alcotest.Config
 	telemetry *telemetry.Config
 	pprof     *pprof.Config
-	logger    *logger.Config
-	cors      *cors.Config
-	owasp     *owasp.Config
-	http      *server.Config
 	health    *health.Config
+
+	server *server.Config
+	cors   *cors.Config
+	owasp  *owasp.Config
 
 	strava    *strava.Config
 	wahoo     *wahoo.Config
@@ -39,14 +40,15 @@ func newConfig() configuration {
 	fs.Usage = flags.Usage(fs)
 
 	config := configuration{
-		http:      server.Flags(fs, ""),
-		health:    health.Flags(fs, ""),
-		alcotest:  alcotest.Flags(fs, ""),
 		logger:    logger.Flags(fs, "logger"),
+		alcotest:  alcotest.Flags(fs, ""),
 		telemetry: telemetry.Flags(fs, "telemetry"),
 		pprof:     pprof.Flags(fs, "pprof"),
-		owasp:     owasp.Flags(fs, "", flags.NewOverride("Csp", "default-src 'self'; base-uri 'self'; script-src 'self'; style-src 'self' 'httputils-nonce'; img-src 'self' api.mapbox.com/styles/v1/mapbox/dark-v11/")),
-		cors:      cors.Flags(fs, "cors"),
+		health:    health.Flags(fs, ""),
+
+		server: server.Flags(fs, ""),
+		cors:   cors.Flags(fs, "cors"),
+		owasp:  owasp.Flags(fs, "", flags.NewOverride("Csp", "default-src 'self'; base-uri 'self'; script-src 'self'; style-src 'self' 'httputils-nonce'; img-src 'self' api.mapbox.com/styles/v1/mapbox/dark-v11/")),
 
 		strava:    strava.Flags(fs, "strava"),
 		wahoo:     wahoo.Flags(fs, "wahoo"),
