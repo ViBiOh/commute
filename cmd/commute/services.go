@@ -7,17 +7,17 @@ import (
 	"github.com/ViBiOh/commute/pkg/wahoo"
 )
 
-type service struct {
+type services struct {
 	commute commute.Service
 	strava  strava.Service
 	wahoo   wahoo.Service
 }
 
-func newService(config configuration) service {
+func newServices(config configuration) services {
 	stravaService := strava.New(config.strava, *config.publicURL)
 	wahooService := wahoo.New(config.wahoo, *config.publicURL)
 
-	return service{
+	return services{
 		strava:  stravaService,
 		wahoo:   wahooService,
 		commute: commute.New(*config.publicURL, mapbox.New(config.mapbox), stravaService, wahooService),
