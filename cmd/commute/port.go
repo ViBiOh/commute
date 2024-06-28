@@ -4,14 +4,19 @@ import (
 	"net/http"
 
 	"github.com/ViBiOh/commute/pkg/templ"
+	"github.com/ViBiOh/httputils/v4/pkg/httputils"
 )
 
-func newPort(config configuration, service services) http.Handler {
+func newPort(config configuration, clients clients, services services) http.Handler {
 	mux := http.NewServeMux()
 
-	mux.Handle("/token/{provider...}", service.commute.HandleToken())
-	mux.Handle("/compute", service.commute.HandleCompute())
-	mux.Handle("/", templ.Handler(*config.publicURL, service.strava.LoginURL()))
+	mux.Handle("/token/{provider...}", services.commute.HandleToken())
+	mux.Handle("/compute", services.commute.HandleCompute())
+	mux.Handle("/", templ.Handler(*config.publicURL, services.strava.LoginURL()))
 
-	return mux
+	return httputils.Handler(mux, clients.health,
+		clients.telemetry.Middleware("http"),
+		services.owasp.Middleware,
+		services.cors.Middleware,
+	)
 }
