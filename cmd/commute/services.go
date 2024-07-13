@@ -1,34 +1,45 @@
 package main
 
 import (
+	"strconv"
+
 	"github.com/ViBiOh/commute/pkg/commute"
-	"github.com/ViBiOh/commute/pkg/mapbox"
 	"github.com/ViBiOh/commute/pkg/strava"
-	"github.com/ViBiOh/commute/pkg/wahoo"
-	"github.com/ViBiOh/httputils/v4/pkg/cors"
-	"github.com/ViBiOh/httputils/v4/pkg/owasp"
 	"github.com/ViBiOh/httputils/v4/pkg/server"
 )
 
 type services struct {
 	server  *server.Server
-	cors    cors.Service
 	strava  strava.Service
-	wahoo   wahoo.Service
 	commute commute.Service
-	owasp   owasp.Service
 }
 
 func newServices(config configuration) services {
 	var output services
 
 	output.server = server.New(config.server)
-	output.owasp = owasp.New(config.owasp)
-	output.cors = cors.New(config.cors)
 
-	output.strava = strava.New(config.strava, *config.publicURL)
-	output.wahoo = wahoo.New(config.wahoo, *config.publicURL)
-	output.commute = commute.New(*config.publicURL, mapbox.New(config.mapbox), output.strava, output.wahoo)
+	output.strava = strava.New(config.strava, getListenAddr(config.server))
+	output.commute = commute.New(config.commute, output.server, output.strava)
 
 	return output
+}
+
+func getListenAddr(config *server.Config) string {
+	port := config.Port
+	if port == 0 {
+		return ""
+	}
+
+	address := config.Address
+	if len(address) == 0 {
+		address = "127.0.0.1"
+	}
+
+	protocol := "http://"
+	if len(config.Cert) != 0 && len(config.Key) != 0 {
+		protocol += "s"
+	}
+
+	return protocol + address + ":" + strconv.FormatUint(uint64(port), 10)
 }

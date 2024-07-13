@@ -14,7 +14,6 @@ import (
 	"github.com/ViBiOh/flags"
 	"github.com/ViBiOh/httputils/v4/pkg/httpjson"
 	"github.com/ViBiOh/httputils/v4/pkg/request"
-	"github.com/twpayne/go-polyline"
 )
 
 const (
@@ -51,29 +50,25 @@ func New(config *Config, uri string) Service {
 	}
 }
 
-func (s Service) ID() string {
-	return "strava"
-}
-
 func (s Service) LoginURL() string {
 	values := url.Values{}
 	values.Add("client_id", s.clientID)
 	values.Add("response_type", "code")
 	values.Add("scope", "read")
 	values.Add("scope", "activity:read")
-	values.Add("redirect_uri", fmt.Sprintf("%s/token/%s", s.uri, s.ID()))
+	values.Add("redirect_uri", fmt.Sprintf("%s/token", s.uri))
 
 	return fmt.Sprintf("%s?%s", authURL, values.Encode())
 }
 
-func (s Service) ExchangeToken(ctx context.Context, r *http.Request) (string, error) {
+func (s Service) ExchangeToken(r *http.Request) (string, error) {
 	values := url.Values{}
 	values.Add("client_id", s.clientID)
 	values.Add("client_secret", s.clientSecret)
 	values.Add("code", r.URL.Query().Get("code"))
 	values.Add("grant+type", "authorization_code")
 
-	resp, err := request.Post(authToken).Form(ctx, values)
+	resp, err := request.Post(authToken).Form(r.Context(), values)
 	if err != nil {
 		return "", fmt.Errorf("exchange token: %w", err)
 	}
@@ -134,18 +129,6 @@ func toRides(activities []Activity) (model.Rides, error) {
 	for _, activity := range activities {
 		if activity.Type != "Ride" {
 			continue
-		}
-
-		if len(activity.Map.SummaryPolyline) != 0 {
-			coords, _, err := polyline.DecodeCoords([]byte(activity.Map.SummaryPolyline))
-			if err != nil {
-				return nil, fmt.Errorf("decode polyline: %w", err)
-			}
-
-			if len(coords) > 2 && len(coords[0]) > 0 && len(coords[len(coords)-1]) > 0 {
-				activity.StartLatlng = coords[0]
-				activity.EndLatlng = coords[len(coords)-1]
-			}
 		}
 
 		start, err := coordinates.NewLatLng(activity.StartLatlng)
