@@ -73,9 +73,8 @@ func (s Service) ExchangeToken(r *http.Request) (string, error) {
 		return "", fmt.Errorf("exchange token: %w", err)
 	}
 
-	var tokenResponse TokenResponse
-
-	if err = httpjson.Read(resp, &tokenResponse); err != nil {
+	tokenResponse, err := httpjson.Read[TokenResponse](resp)
+	if err != nil {
 		return "", fmt.Errorf("read token: %w", err)
 	}
 
@@ -115,12 +114,7 @@ func (s Service) getActivities(ctx context.Context, requester request.Request, b
 		return nil, fmt.Errorf("fetch: %w", err)
 	}
 
-	var activities []Activity
-	if err = httpjson.Read(resp, &activities); err != nil {
-		return nil, err
-	}
-
-	return activities, nil
+	return httpjson.Read[[]Activity](resp)
 }
 
 func toRides(activities []Activity) (model.Rides, error) {
