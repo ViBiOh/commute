@@ -33,8 +33,8 @@ func Geocode(ctx context.Context, query string) (coordinates.LatLng, string, err
 		return coordinates.LatLng{}, "", fmt.Errorf("search: %w", err)
 	}
 
-	var responses []Response
-	if err := httpjson.Read(resp, &responses); err != nil {
+	responses, err := httpjson.Read[[]Response](resp)
+	if err != nil {
 		return coordinates.LatLng{}, "", fmt.Errorf("parse: %w", err)
 	}
 
@@ -67,8 +67,8 @@ func Reverse(ctx context.Context, coord coordinates.LatLng) (string, error) {
 		return "", fmt.Errorf("reverse: %w", err)
 	}
 
-	var response Response
-	if err := httpjson.Read(resp, &response); err != nil {
+	response, err := httpjson.Read[Response](resp)
+	if err != nil {
 		return "", fmt.Errorf("parse: %w", err)
 	}
 
